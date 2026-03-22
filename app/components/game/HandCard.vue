@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { Card } from "../../types/game";
-import { rankLabel, suitSymbol, suitLabel, isRedSuit } from "../../utils/card";
+import type { Card } from "@/types/game";
+import { rankLabel, suitSymbol, suitLabel, isRedSuit } from "@/utils/card";
 
 const props = defineProps<{
   card: Card;

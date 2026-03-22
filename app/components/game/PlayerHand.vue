@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { Card } from "../../types/game";
+import type { Card } from "@/types/game";
+import { areCardsEqual } from "@/utils/card";
 
 const props = defineProps<{
   hand: Card[];
@@ -12,7 +13,7 @@ const emit = defineEmits<{
 }>();
 
 function isValid(card: Card) {
-  return props.validCards.some((c) => c.suit === card.suit && c.rank === card.rank);
+  return props.validCards.some((c) => areCardsEqual(c, card));
 }
 </script>
 

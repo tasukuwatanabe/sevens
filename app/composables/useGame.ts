@@ -1,7 +1,7 @@
-import type { Card, GameState } from "../types/game";
-import { initGame, placeCard, passTurn } from "../../game/state";
-import { decideCpuAction } from "../../game/cpu";
-import { getValidCards, canPass } from "../../game/rules";
+import type { Card, GameState } from "@/types/game";
+import { initGame, placeCard, passTurn } from "@/game/state";
+import { decideCpuAction } from "@/game/cpu";
+import { getValidCards, canPass } from "@/game/rules";
 import { useLocalStorage } from "./useLocalStorage";
 
 const STORAGE_KEY = "sevens-game-state";

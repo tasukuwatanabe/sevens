@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { MAX_PASSES } from "../../../game/constants";
+import { MAX_PASSES } from "@/game/constants";
 
 const props = defineProps<{
   name: string;

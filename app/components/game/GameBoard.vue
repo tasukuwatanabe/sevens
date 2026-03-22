@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { SUITS } from "../../../game/constants";
-import { useGame } from "../../composables/useGame";
+import { SUITS } from "@/game/constants";
+import { useGame } from "@/composables/useGame";
 
 const {
   state,

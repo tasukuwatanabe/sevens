@@ -1,4 +1,4 @@
-import type { Suit, Rank } from "../types/game";
+import type { Suit, Rank, Card } from "@/types/game";
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
   spades: "♠",
@@ -44,4 +44,8 @@ export function rankLabel(rank: Rank) {
 
 export function isRedSuit(suit: Suit) {
   return suit === "hearts" || suit === "diamonds";
+}
+
+export function areCardsEqual(a: Card, b: Card): boolean {
+  return a.suit === b.suit && a.rank === b.rank;
 }

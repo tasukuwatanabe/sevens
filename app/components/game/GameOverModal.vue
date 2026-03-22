@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from "vue";
-import type { PlayerId } from "../../types/game";
+import type { PlayerId } from "@/types/game";
 
 const props = defineProps<{
   winner: PlayerId;
