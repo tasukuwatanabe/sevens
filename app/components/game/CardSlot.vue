@@ -15,7 +15,7 @@ const isRed = computed(() => isRedSuit(props.suit));
 
 <template>
   <div
-    class="w-6 h-9 sm:w-14 sm:h-20 rounded flex items-center justify-center text-xs sm:text-sm font-bold select-none"
+    class="w-7 h-10 sm:w-14 sm:h-20 rounded flex items-center justify-center text-xs sm:text-sm font-bold select-none"
     :class="[
       placed || isSeven
         ? isRed

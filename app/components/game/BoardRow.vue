@@ -18,13 +18,13 @@ function isPlaced(rank: number) {
 <template>
   <div class="flex items-center gap-1">
     <span
-      class="w-5 text-sm sm:w-6 sm:text-lg font-bold"
+      class="hidden sm:inline sm:w-6 sm:text-lg font-bold"
       :class="isRed ? 'text-red-500' : 'text-gray-800'"
       :aria-label="suitLabel(boardSuit.suit)"
     >
       {{ suitSymbol(boardSuit.suit) }}
     </span>
-    <div class="flex gap-px sm:gap-0.5">
+    <div class="flex gap-0 sm:gap-0.5">
       <CardSlot
         v-for="rank in RANKS"
         :key="rank"

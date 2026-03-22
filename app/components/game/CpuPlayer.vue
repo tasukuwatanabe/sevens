@@ -23,7 +23,9 @@ const color = computed(() => CPU_PLAYER_COLORS[props.playerIndex] ?? CPU_PLAYER_
     <div class="text-xs font-semibold text-gray-700">{{ name }}</div>
     <div class="text-sm font-bold text-gray-900">{{ handCount }}枚</div>
     <div class="text-xs text-gray-500">パス {{ MAX_PASSES - passesUsed }}/{{ MAX_PASSES }}</div>
-    <div v-show="isCurrentTurn" class="text-xs font-semibold text-gray-700">ターン中</div>
-    <div v-show="isThinking" class="text-xs animate-pulse" :class="color.text">考え中…</div>
+    <div class="text-xs h-4 flex items-center justify-center">
+      <span v-if="isThinking" class="animate-pulse" :class="color.text">考え中…</span>
+      <span v-else-if="isCurrentTurn" class="font-semibold text-gray-700">ターン中</span>
+    </div>
   </div>
 </template>
