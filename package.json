@@ -21,14 +21,13 @@
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/user-event": "^14.5.2",
     "@testing-library/vue": "^8.1.0",
     "@vite-pwa/nuxt": "^1.1.1",
     "@vitejs/plugin-vue": "^6.0.5",
     "playwright": "^1.58.2",
     "vite-plus": "latest",
     "vitest": "npm:@voidzero-dev/vite-plus-test@^0.1.13",
-    "vue-tsc": "3.2.6"
+    "vue-tsc": "^3.2.6"
   },
   "packageManager": "pnpm@10.32.1",
   "pnpm": {
