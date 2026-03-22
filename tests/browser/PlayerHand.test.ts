@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
 import { render, fireEvent } from "@testing-library/vue";
-import userEvent from "@testing-library/user-event";
 import PlayerHand from "@/components/game/PlayerHand.vue";
 import HandCard from "@/components/game/HandCard.vue";
 import type { Card } from "@/types/game";
@@ -22,43 +21,40 @@ const globalConfig = {
 
 describe("PlayerHand", () => {
   it("手札のカードをすべて表示する", () => {
-    const result = render(PlayerHand, {
-      props: { hand, validCards, disabled: false },
-      ...globalConfig,
-    });
-    const buttons = result.getAllByRole("button");
-    expect(buttons).toHaveLength(3);
+    const props = { hand, validCards, disabled: false };
+
+    const result = render(PlayerHand, { props, ...globalConfig });
+
+    expect(result.getAllByRole("button")).toHaveLength(3);
   });
 
   it("有効なカードは有効、無効なカードはdisabled", () => {
-    const result = render(PlayerHand, {
-      props: { hand, validCards, disabled: false },
-      ...globalConfig,
-    });
-    const buttons = result.getAllByRole("button") as HTMLButtonElement[];
-    expect(buttons[0]!.disabled).toBe(false);
-    expect(buttons[1]!.disabled).toBe(false);
-    expect(buttons[2]!.disabled).toBe(true);
+    const props = { hand, validCards, disabled: false };
+
+    const result = render(PlayerHand, { props, ...globalConfig });
+    const buttons = result.getAllByRole("button");
+
+    expect(buttons[0]).not.toBeDisabled();
+    expect(buttons[1]).not.toBeDisabled();
+    expect(buttons[2]).toBeDisabled();
   });
 
   it("有効なカードをクリックするとplayイベントが発火する", async () => {
-    const result = render(PlayerHand, {
-      props: { hand, validCards, disabled: false },
-      ...globalConfig,
-    });
-    const buttons = result.getAllByRole("button");
-    await fireEvent.click(buttons[0]!);
+    const props = { hand, validCards, disabled: false };
+
+    const result = render(PlayerHand, { props, ...globalConfig });
+    await fireEvent.click(result.getAllByRole("button")[0]!);
+
     expect(result.emitted().play).toBeDefined();
     expect(result.emitted().play).toHaveLength(1);
   });
 
-  it("disabled=trueの時はクリックしてもイベントが発火しない", async () => {
-    const result = render(PlayerHand, {
-      props: { hand, validCards, disabled: true },
-      ...globalConfig,
-    });
+  it("disabled=trueの時はすべてのボタンが無効化される", () => {
+    const props = { hand, validCards, disabled: true };
+
+    const result = render(PlayerHand, { props, ...globalConfig });
     const buttons = result.getAllByRole("button");
-    await userEvent.click(buttons[0]!);
-    expect(result.emitted().play).toBeUndefined();
+
+    buttons.forEach((button) => expect(button).toBeDisabled());
   });
 });

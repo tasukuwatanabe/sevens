@@ -5,81 +5,88 @@ import GameStatus from "@/components/game/GameStatus.vue";
 
 describe("CpuPlayer コンポーネント", () => {
   it("プレイヤー名を表示する", () => {
-    const result = render(CpuPlayer, {
-      props: {
-        name: "CPU 1",
-        handCount: 8,
-        passesUsed: 1,
-        isCurrentTurn: false,
-        isThinking: false,
-        playerIndex: 1,
-      },
-    });
+    const props = {
+      name: "CPU 1",
+      handCount: 8,
+      passesUsed: 1,
+      isCurrentTurn: false,
+      isThinking: false,
+      playerIndex: 1,
+    };
+
+    const result = render(CpuPlayer, { props });
+
     expect(result.getByText("CPU 1")).toBeTruthy();
   });
 
   it("手札枚数を表示する", () => {
-    const { container } = render(CpuPlayer, {
-      props: {
-        name: "CPU 1",
-        handCount: 8,
-        passesUsed: 1,
-        isCurrentTurn: false,
-        isThinking: false,
-        playerIndex: 1,
-      },
-    });
+    const props = {
+      name: "CPU 1",
+      handCount: 8,
+      passesUsed: 1,
+      isCurrentTurn: false,
+      isThinking: false,
+      playerIndex: 1,
+    };
+
+    const { container } = render(CpuPlayer, { props });
+
     expect(within(container as HTMLElement).getByText("8枚")).toBeTruthy();
   });
 
-  it("isCurrentTurn=trueの時ハイライトクラスが付く", () => {
-    const { container } = render(CpuPlayer, {
-      props: {
-        name: "CPU 2",
-        handCount: 5,
-        passesUsed: 0,
-        isCurrentTurn: true,
-        isThinking: false,
-        playerIndex: 2,
-      },
-    });
-    expect(container.firstChild).toHaveClass("border-violet-400");
+  it("isCurrentTurn=trueの時aria-currentが設定される", () => {
+    const props = {
+      name: "CPU 2",
+      handCount: 5,
+      passesUsed: 0,
+      isCurrentTurn: true,
+      isThinking: false,
+      playerIndex: 2,
+    };
+
+    const { container } = render(CpuPlayer, { props });
+
+    expect(container.firstChild).toHaveAttribute("aria-current", "true");
   });
 
   it("isThinking=trueの時「考え中…」を表示する", () => {
-    const result = render(CpuPlayer, {
-      props: {
-        name: "CPU 3",
-        handCount: 3,
-        passesUsed: 0,
-        isCurrentTurn: true,
-        isThinking: true,
-        playerIndex: 3,
-      },
-    });
+    const props = {
+      name: "CPU 3",
+      handCount: 3,
+      passesUsed: 0,
+      isCurrentTurn: true,
+      isThinking: true,
+      playerIndex: 3,
+    };
+
+    const result = render(CpuPlayer, { props });
+
     expect(result.getByText("考え中…")).toBeTruthy();
   });
 });
 
 describe("GameStatus コンポーネント", () => {
   it("人間ターンのメッセージを表示する", () => {
-    const result = render(GameStatus, {
-      props: { status: "human-turn", playerName: "あなた" },
-    });
+    const props = { status: "human-turn", playerName: "あなた" };
+
+    const result = render(GameStatus, { props });
+
     expect(result.getByText("あなたのターン")).toBeTruthy();
   });
 
-  it("人間ターン時は緑背景クラスが付く", () => {
-    const { container } = render(GameStatus, {
-      props: { status: "human-turn", playerName: "あなた" },
-    });
-    expect(container.firstChild).toHaveClass("bg-green-100");
+  it("role='status'が設定されている", () => {
+    const props = { status: "human-turn", playerName: "あなた" };
+
+    const result = render(GameStatus, { props });
+
+    expect(result.getByRole("status")).toBeTruthy();
   });
 
-  it("CPUターン時はグレー背景クラスが付く", () => {
-    const { container } = render(GameStatus, {
-      props: { status: "cpu-turn", playerName: "CPU 1" },
-    });
-    expect(container.firstChild).toHaveClass("bg-gray-100");
+  it("cpu-thinkingの時「考え中…」メッセージを表示する", () => {
+    const props = { status: "cpu-thinking", playerName: "CPU 1" };
+
+    const result = render(GameStatus, { props });
+
+    expect(result.getByText("CPU 1が考え中…")).toBeTruthy();
   });
 });
