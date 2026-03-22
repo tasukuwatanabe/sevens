@@ -16,7 +16,11 @@ const emit = defineEmits<{
 const isRed = computed(() => isRedSuit(props.card.suit));
 
 const buttonClasses = computed(() => {
-  if (props.disabled) return "cursor-not-allowed border-gray-200 bg-white text-gray-400";
+  if (props.disabled) {
+    return isRed.value
+      ? "cursor-not-allowed border-red-200 bg-white text-red-300"
+      : "cursor-not-allowed border-gray-200 bg-white text-gray-400";
+  }
   if (props.isValid) {
     return isRed.value
       ? "border-red-400 bg-white text-red-600 hover:scale-105 hover:shadow-md cursor-pointer"
