@@ -18,6 +18,7 @@ logs
 .fleet
 .idea
 .serena
+.playwright-mcp
 
 # Local env files
 .env
