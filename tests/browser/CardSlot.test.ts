@@ -7,17 +7,23 @@ describe("CardSlot", () => {
   it("placed=trueの時、aria-labelに「配置済み」が含まれる", () => {
     const props = { rank: 8, suit: "spades", placed: true, isSeven: false };
 
-    const { getByRole } = render(CardSlot, { props });
+    const result = render(CardSlot, { props });
 
-    expect(getByRole("img")).toHaveAttribute("aria-label", expect.stringContaining("配置済み"));
+    expect(result.getByRole("img")).toHaveAttribute(
+      "aria-label",
+      expect.stringContaining("配置済み"),
+    );
   });
 
   it("placed=falseかつisSeven=falseの時、aria-labelに「未配置」が含まれる", () => {
     const props = { rank: 6, suit: "spades", placed: false, isSeven: false };
 
-    const { getByRole } = render(CardSlot, { props });
+    const result = render(CardSlot, { props });
 
-    expect(getByRole("img")).toHaveAttribute("aria-label", expect.stringContaining("未配置"));
+    expect(result.getByRole("img")).toHaveAttribute(
+      "aria-label",
+      expect.stringContaining("未配置"),
+    );
   });
 });
 
