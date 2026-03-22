@@ -1,11 +1,11 @@
-import type { Card, GameState } from "@/types/game";
+import type { Card, GameState, GameStatusCode } from "@/types/game";
 import { initGame, placeCard, passTurn } from "@/game/state";
 import { decideCpuAction } from "@/game/cpu";
 import { getValidCards, canPass } from "@/game/rules";
 import { useLocalStorage } from "./useLocalStorage";
+import { CPU_THINK_MS } from "@/game/constants";
 
 const STORAGE_KEY = "sevens-game-state";
-const CPU_THINK_MS = 1500;
 
 function sleep(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -25,14 +25,14 @@ export function useGame() {
   );
   const cpuPlayers = computed(() => state.value.players.filter((p) => p.type === "cpu"));
   const humanPlayer = computed(() => state.value.players.find((p) => p.type === "human")!);
-  const statusMessage = computed(() => {
-    if (cpuThinking.value) return `${currentPlayer.value.name}が考え中…`;
+  const gameStatus = computed((): GameStatusCode => {
+    if (cpuThinking.value) return "cpu-thinking";
     if (isHumanTurn.value) {
-      if (validCards.value.length > 0) return "カードを選んで置いてください";
-      if (canPassTurn.value) return "置けるカードがありません。パスしてください";
-      return "あなたのターン";
+      if (validCards.value.length > 0) return "human-place";
+      if (canPassTurn.value) return "human-must-pass";
+      return "human-turn";
     }
-    return `${currentPlayer.value.name}のターン`;
+    return "cpu-turn";
   });
 
   function playCard(card: Card) {
@@ -87,7 +87,7 @@ export function useGame() {
     cpuThinking,
     cpuPlayers,
     humanPlayer,
-    statusMessage,
+    gameStatus,
     playCard,
     pass,
     resetGame,

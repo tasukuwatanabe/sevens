@@ -27,6 +27,13 @@ export type Board = Record<Suit, BoardSuit>;
 
 export type GamePhase = "playing" | "gameover";
 
+export type GameStatusCode =
+  | "cpu-thinking"
+  | "human-place"
+  | "human-must-pass"
+  | "human-turn"
+  | "cpu-turn";
+
 export interface GameState {
   phase: GamePhase;
   board: Board;

@@ -1,8 +1,28 @@
 <script setup lang="ts">
-defineProps<{
-  message: string;
-  isHumanTurn: boolean;
+import { computed } from "vue";
+import type { GameStatusCode } from "@/types/game";
+
+const props = defineProps<{
+  status: GameStatusCode;
+  playerName: string;
 }>();
+
+const STATUS_MESSAGES: Record<GameStatusCode, (name: string) => string> = {
+  "cpu-thinking": (name) => `${name}が考え中…`,
+  "human-place": () => "カードを選んで置いてください",
+  "human-must-pass": () => "置けるカードがありません。パスしてください",
+  "human-turn": () => "あなたのターン",
+  "cpu-turn": (name) => `${name}のターン`,
+};
+
+const isHumanTurn = computed(
+  () =>
+    props.status === "human-place" ||
+    props.status === "human-must-pass" ||
+    props.status === "human-turn",
+);
+
+const message = computed(() => STATUS_MESSAGES[props.status](props.playerName));
 </script>
 
 <template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { MAX_PASSES } from "@/game/constants";
+import { MAX_PASSES, CPU_PLAYER_COLORS } from "@/game/constants";
 
 const props = defineProps<{
   name: string;
@@ -11,13 +11,7 @@ const props = defineProps<{
   playerIndex: number;
 }>();
 
-const colors = [
-  { border: "border-blue-400", bg: "bg-blue-50", text: "text-blue-500" },
-  { border: "border-orange-400", bg: "bg-orange-50", text: "text-orange-500" },
-  { border: "border-violet-400", bg: "bg-violet-50", text: "text-violet-500" },
-];
-
-const color = computed(() => colors[props.playerIndex] ?? colors[0]!);
+const color = computed(() => CPU_PLAYER_COLORS[props.playerIndex] ?? CPU_PLAYER_COLORS[0]);
 </script>
 
 <template>
