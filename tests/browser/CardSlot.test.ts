@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, fireEvent } from "@testing-library/vue";
+import userEvent from "@testing-library/user-event";
 import CardSlot from "../../app/components/game/CardSlot.vue";
 import HandCard from "../../app/components/game/HandCard.vue";
 
@@ -46,7 +47,7 @@ describe("HandCard", () => {
     const result = render(HandCard, {
       props: { card: { suit: "hearts", rank: 8 }, isValid: true, disabled: true },
     });
-    await fireEvent.click(result.getByRole("button"));
+    await userEvent.click(result.getByRole("button"));
     expect(result.emitted().play).toBeUndefined();
   });
 });

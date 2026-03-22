@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, fireEvent } from "@testing-library/vue";
+import userEvent from "@testing-library/user-event";
 import PlayerHand from "@/components/game/PlayerHand.vue";
 import HandCard from "@/components/game/HandCard.vue";
 import type { Card } from "@/types/game";
@@ -57,7 +58,7 @@ describe("PlayerHand", () => {
       ...globalConfig,
     });
     const buttons = result.getAllByRole("button");
-    await fireEvent.click(buttons[0]!);
+    await userEvent.click(buttons[0]!);
     expect(result.emitted().play).toBeUndefined();
   });
 });
