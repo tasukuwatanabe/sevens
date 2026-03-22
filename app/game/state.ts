@@ -38,10 +38,34 @@ export function initGame(): GameState {
   const hands = dealCards(remaining, PLAYER_COUNT);
 
   const players: Player[] = [
-    { id: "human", type: "human", name: "あなた", hand: hands.at(0) ?? [], passesUsed: 0 },
-    { id: "cpu1", type: "cpu", name: "CPU 1", hand: hands.at(1) ?? [], passesUsed: 0 },
-    { id: "cpu2", type: "cpu", name: "CPU 2", hand: hands.at(2) ?? [], passesUsed: 0 },
-    { id: "cpu3", type: "cpu", name: "CPU 3", hand: hands.at(3) ?? [], passesUsed: 0 },
+    {
+      id: "human",
+      type: "human",
+      name: "あなた",
+      hand: hands.at(0) ?? [],
+      passesUsed: 0,
+    },
+    {
+      id: "cpu1",
+      type: "cpu",
+      name: "CPU 1",
+      hand: hands.at(1) ?? [],
+      passesUsed: 0,
+    },
+    {
+      id: "cpu2",
+      type: "cpu",
+      name: "CPU 2",
+      hand: hands.at(2) ?? [],
+      passesUsed: 0,
+    },
+    {
+      id: "cpu3",
+      type: "cpu",
+      name: "CPU 3",
+      hand: hands.at(3) ?? [],
+      passesUsed: 0,
+    },
   ];
 
   return {
@@ -58,7 +82,9 @@ export function placeCard(state: GameState, card: Card): GameState {
   const player = state.players[playerIndex]!;
   const newHand = removeFromHand(player.hand, card);
   const newBoard = updateBoard(state.board, card);
-  const newPlayers = updatePlayer(state.players, playerIndex, { hand: newHand });
+  const newPlayers = updatePlayer(state.players, playerIndex, {
+    hand: newHand,
+  });
   const winner: PlayerId | null = newHand.length === 0 ? player.id : null;
 
   return {

@@ -38,7 +38,9 @@ onUnmounted(() => {
     aria-labelledby="game-over-title"
   >
     <div class="bg-white rounded-2xl shadow-xl p-8 text-center max-w-sm w-full mx-4">
-      <div class="text-4xl mb-3" aria-hidden="true">{{ isHumanWin ? "🎉" : "😢" }}</div>
+      <div class="text-4xl mb-3" aria-hidden="true">
+        {{ isHumanWin ? "🎉" : "😢" }}
+      </div>
       <h2 id="game-over-title" class="text-2xl font-bold mb-2">
         {{ isHumanWin ? "勝利！" : "ゲームオーバー" }}
       </h2>

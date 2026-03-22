@@ -7,7 +7,9 @@ describe("ActionButtons", () => {
     const result = render(ActionButtons, {
       props: { canPass: true, isHumanTurn: true },
     });
-    const passBtn = result.getByRole("button", { name: "パス" }) as HTMLButtonElement;
+    const passBtn = result.getByRole("button", {
+      name: "パス",
+    }) as HTMLButtonElement;
     expect(passBtn.disabled).toBe(false);
   });
 
@@ -15,7 +17,9 @@ describe("ActionButtons", () => {
     const result = render(ActionButtons, {
       props: { canPass: false, isHumanTurn: true },
     });
-    const passBtn = result.getByRole("button", { name: "パス" }) as HTMLButtonElement;
+    const passBtn = result.getByRole("button", {
+      name: "パス",
+    }) as HTMLButtonElement;
     expect(passBtn.disabled).toBe(true);
   });
 
@@ -23,7 +27,9 @@ describe("ActionButtons", () => {
     const result = render(ActionButtons, {
       props: { canPass: true, isHumanTurn: false },
     });
-    const passBtn = result.getByRole("button", { name: "パス" }) as HTMLButtonElement;
+    const passBtn = result.getByRole("button", {
+      name: "パス",
+    }) as HTMLButtonElement;
     expect(passBtn.disabled).toBe(true);
   });
 

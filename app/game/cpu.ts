@@ -43,5 +43,8 @@ export function decideCpuAction(player: Player, board: Board): CpuAction {
     return { type: "pass" };
   }
 
-  return { type: "place", card: selectBestCard(validCards, player.hand, board) };
+  return {
+    type: "place",
+    card: selectBestCard(validCards, player.hand, board),
+  };
 }

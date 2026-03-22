@@ -11,14 +11,26 @@ function makeBoard(overrides: Partial<Record<string, { low: number; high: number
   };
   const merged = { ...defaults, ...overrides };
   return {
-    spades: { suit: "spades", low: merged.spades.low as any, high: merged.spades.high as any },
-    hearts: { suit: "hearts", low: merged.hearts.low as any, high: merged.hearts.high as any },
+    spades: {
+      suit: "spades",
+      low: merged.spades.low as any,
+      high: merged.spades.high as any,
+    },
+    hearts: {
+      suit: "hearts",
+      low: merged.hearts.low as any,
+      high: merged.hearts.high as any,
+    },
     diamonds: {
       suit: "diamonds",
       low: merged.diamonds.low as any,
       high: merged.diamonds.high as any,
     },
-    clubs: { suit: "clubs", low: merged.clubs.low as any, high: merged.clubs.high as any },
+    clubs: {
+      suit: "clubs",
+      low: merged.clubs.low as any,
+      high: merged.clubs.high as any,
+    },
   };
 }
 
