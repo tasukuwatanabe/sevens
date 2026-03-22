@@ -1,7 +1,5 @@
 # 7並べ
 
-[![CI](https://github.com/tasuku/sevens/actions/workflows/ci.yml/badge.svg)](https://github.com/tasuku/sevens/actions/workflows/ci.yml)
-
 ブラウザで遊べる 7並べの実装です。あなた（人間）1人と CPU 3人の計4人で対戦します。
 
 ![ゲーム画面](docs/screenshot.png)
@@ -27,7 +25,7 @@
 | フレームワーク | Nuxt 4 / Vue 3 |
 | 言語           | TypeScript     |
 | スタイリング   | Tailwind CSS   |
-| テスト         | Vitest         |
+| ツールチェーン | Vite+          |
 | パッケージ管理 | pnpm           |
 
 ## セットアップ
@@ -50,15 +48,17 @@ pnpm lint      # 型チェック・Lint
 
 ```
 app/
-├── game/            # ゲームロジック（UI 非依存）
+├── game/            # ゲームロジック
 │   ├── constants.ts
 │   ├── deck.ts
 │   ├── rules.ts
 │   ├── cpu.ts
-│   └── state.ts
+│   ├── state.ts
+│   └── index.ts
 ├── components/game/ # ゲーム UI コンポーネント
 ├── composables/     # Vue Composition API フック
+├── pages/           # ページコンポーネント
 ├── types/           # TypeScript 型定義
 └── utils/           # ユーティリティ関数
-tests/               # ブラウザテスト（Playwright）
+tests/               # テスト（Vite+）
 ```
