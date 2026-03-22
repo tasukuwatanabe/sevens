@@ -33,5 +33,4 @@ export interface GameState {
   players: Player[];
   currentPlayerIndex: number;
   winner: PlayerId | null;
-  cpuThinking: boolean;
 }

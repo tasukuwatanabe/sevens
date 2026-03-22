@@ -13,6 +13,7 @@ function sleep(ms: number) {
 
 export function useGame() {
   const state = useLocalStorage<GameState>(STORAGE_KEY, initGame());
+  const cpuThinking = ref(false);
 
   const currentPlayer = computed(() => state.value.players[state.value.currentPlayerIndex]!);
   const isHumanTurn = computed(() => currentPlayer.value.type === "human");
@@ -22,6 +23,17 @@ export function useGame() {
   const canPassTurn = computed(
     () => isHumanTurn.value && canPass(currentPlayer.value) && validCards.value.length === 0,
   );
+  const cpuPlayers = computed(() => state.value.players.filter((p) => p.type === "cpu"));
+  const humanPlayer = computed(() => state.value.players.find((p) => p.type === "human")!);
+  const statusMessage = computed(() => {
+    if (cpuThinking.value) return `${currentPlayer.value.name}が考え中…`;
+    if (isHumanTurn.value) {
+      if (validCards.value.length > 0) return "カードを選んで置いてください";
+      if (canPassTurn.value) return "置けるカードがありません。パスしてください";
+      return "あなたのターン";
+    }
+    return `${currentPlayer.value.name}のターン`;
+  });
 
   function playCard(card: Card) {
     if (!isHumanTurn.value) return;
@@ -44,7 +56,7 @@ export function useGame() {
     const player = s.players[s.currentPlayerIndex]!;
     if (player.type !== "cpu") return;
 
-    state.value = { ...s, cpuThinking: true };
+    cpuThinking.value = true;
     await sleep(CPU_THINK_MS);
 
     const action = decideCpuAction(player, state.value.board);
@@ -53,7 +65,7 @@ export function useGame() {
     } else {
       state.value = passTurn(state.value);
     }
-    state.value = { ...state.value, cpuThinking: false };
+    cpuThinking.value = false;
   }
 
   watch(
@@ -66,5 +78,18 @@ export function useGame() {
     { immediate: true },
   );
 
-  return { state, currentPlayer, isHumanTurn, validCards, canPassTurn, playCard, pass, resetGame };
+  return {
+    state,
+    currentPlayer,
+    isHumanTurn,
+    validCards,
+    canPassTurn,
+    cpuThinking,
+    cpuPlayers,
+    humanPlayer,
+    statusMessage,
+    playCard,
+    pass,
+    resetGame,
+  };
 }

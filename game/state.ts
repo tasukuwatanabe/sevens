@@ -45,7 +45,6 @@ export function initGame(): GameState {
     players,
     currentPlayerIndex: 0,
     winner: null,
-    cpuThinking: false,
   };
 }
 
