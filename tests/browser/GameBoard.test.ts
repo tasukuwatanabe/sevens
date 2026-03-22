@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, within } from "@testing-library/vue";
-import CpuPlayer from "../../app/components/game/CpuPlayer.vue";
-import GameStatus from "../../app/components/game/GameStatus.vue";
+import CpuPlayer from "@/components/game/CpuPlayer.vue";
+import GameStatus from "@/components/game/GameStatus.vue";
 
 describe("CpuPlayer コンポーネント", () => {
   it("プレイヤー名を表示する", () => {

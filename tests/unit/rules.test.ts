@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { isValidPlay, getValidCards, canPass } from "../../game/rules";
-import type { Board, Player } from "../../app/types/game";
+import { isValidPlay, getValidCards, canPass } from "@/game/rules";
+import type { Board, Player } from "@/types/game";
 
 function makeBoard(overrides: Partial<Record<string, { low: number; high: number }>> = {}): Board {
   const defaults = {

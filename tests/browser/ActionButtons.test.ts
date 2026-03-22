@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, fireEvent } from "@testing-library/vue";
-import ActionButtons from "../../app/components/game/ActionButtons.vue";
+import ActionButtons from "@/components/game/ActionButtons.vue";
 
 describe("ActionButtons", () => {
   it("canPass=trueかつisHumanTurn=trueの時パスボタンが有効", () => {

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { decideCpuAction } from "../../game/cpu";
-import type { Player, Board } from "../../app/types/game";
+import { decideCpuAction } from "@/game/cpu";
+import type { Player, Board } from "@/types/game";
 
 function makeBoard(): Board {
   return {

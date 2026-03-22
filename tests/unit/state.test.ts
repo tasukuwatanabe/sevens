@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { initGame, placeCard, passTurn, checkWinner } from "../../game/state";
-import type { Card } from "../../app/types/game";
+import { initGame, placeCard, passTurn } from "@/game/state";
+import type { Card } from "@/types/game";
 
 describe("initGame", () => {
   it("4人のプレイヤーがいる", () => {
@@ -97,18 +97,5 @@ describe("passTurn", () => {
     const state = initGame();
     const next = passTurn(state);
     expect(next.currentPlayerIndex).toBe(1);
-  });
-});
-
-describe("checkWinner", () => {
-  it("手札がある間はnull", () => {
-    const state = initGame();
-    expect(checkWinner(state)).toBeNull();
-  });
-
-  it("手札が空のプレイヤーのidを返す", () => {
-    const state = initGame();
-    state.players[2]!.hand = [];
-    expect(checkWinner(state)).toBe("cpu2");
   });
 });

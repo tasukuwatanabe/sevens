@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { render, fireEvent } from "@testing-library/vue";
-import PlayerHand from "../../app/components/game/PlayerHand.vue";
-import HandCard from "../../app/components/game/HandCard.vue";
-import type { Card } from "../../app/types/game";
+import PlayerHand from "@/components/game/PlayerHand.vue";
+import HandCard from "@/components/game/HandCard.vue";
+import type { Card } from "@/types/game";
 
 const hand: Card[] = [
   { suit: "spades", rank: 6 },

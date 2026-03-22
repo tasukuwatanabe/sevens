@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createDeck, shuffleDeck, dealCards } from "../../game/deck";
+import { createDeck, shuffleDeck, dealCards } from "@/game/deck";
 
 describe("createDeck", () => {
   it("52枚のカードを生成する", () => {

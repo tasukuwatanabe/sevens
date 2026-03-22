@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { initGame, placeCard, passTurn } from "../../game/state";
-import { getValidCards, canPass } from "../../game/rules";
-import { decideCpuAction } from "../../game/cpu";
-import type { GameState } from "../../app/types/game";
-import { SUITS } from "../../game/constants";
+import { initGame, placeCard, passTurn } from "@/game/state";
+import { getValidCards, canPass } from "@/game/rules";
+import { decideCpuAction } from "@/game/cpu";
+import type { GameState } from "@/types/game";
+import { SUITS } from "@/game/constants";
 
 function playUntilEnd(state: GameState, maxTurns = 2000): GameState {
   let current = state;
