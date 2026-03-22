@@ -36,6 +36,7 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install chromium --with-deps
       - run: pnpm test
 
   build:
