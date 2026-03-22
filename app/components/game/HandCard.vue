@@ -18,7 +18,7 @@ const isRed = computed(() => isRedSuit(props.card.suit));
 
 <template>
   <button
-    class="w-12 h-16 rounded-lg border-2 flex flex-col items-center justify-center text-sm font-bold transition-all"
+    class="w-14 h-20 rounded-lg border-2 flex flex-col items-center justify-center text-base font-bold transition-all"
     :class="[
       disabled
         ? 'opacity-40 cursor-not-allowed border-gray-200 bg-gray-50'

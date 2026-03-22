@@ -15,13 +15,13 @@ const isRed = computed(() => isRedSuit(props.suit));
 
 <template>
   <div
-    class="w-10 h-14 rounded border flex items-center justify-center text-xs font-bold select-none"
+    class="w-14 h-20 rounded flex items-center justify-center text-sm font-bold select-none"
     :class="[
       placed || isSeven
         ? isRed
-          ? 'bg-white border-red-400 text-red-600'
-          : 'bg-white border-gray-700 text-gray-900'
-        : 'bg-gray-100 border-dashed border-gray-300 text-gray-300',
+          ? 'bg-white border-2 border-red-400 text-red-600'
+          : 'bg-white border-2 border-gray-700 text-gray-900'
+        : 'bg-gray-100 border-2 border-dashed border-gray-300 text-gray-300',
     ]"
   >
     <template v-if="placed || isSeven">
