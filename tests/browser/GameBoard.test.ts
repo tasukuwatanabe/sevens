@@ -43,7 +43,7 @@ describe("CpuPlayer コンポーネント", () => {
         playerIndex: 2,
       },
     });
-    expect(container.firstChild).toHaveClass("border-blue-400");
+    expect(container.firstChild).toHaveClass("border-violet-400");
   });
 
   it("isThinking=trueの時「考え中…」を表示する", () => {
