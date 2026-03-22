@@ -1,4 +1,4 @@
-import type { Card, Board, Player } from "../app/types/game";
+import type { Card, Board, Player } from "@/types/game";
 import { MAX_PASSES } from "./constants";
 
 export function isValidPlay(card: Card, board: Board): boolean {

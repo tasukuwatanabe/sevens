@@ -1,4 +1,4 @@
-import type { Card, GameState, PlayerId, Board, Player } from "../app/types/game";
+import type { Card, GameState, PlayerId, Board, Player } from "@/types/game";
 import { SUITS, INITIAL_RANK, PLAYER_COUNT } from "./constants";
 import { createDeck, shuffleDeck, dealCards } from "./deck";
 

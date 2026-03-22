@@ -1,4 +1,4 @@
-import type { Card, Player, Board } from "../app/types/game";
+import type { Card, Player, Board } from "@/types/game";
 import { getValidCards, canPass } from "./rules";
 import { isValidPlay } from "./rules";
 

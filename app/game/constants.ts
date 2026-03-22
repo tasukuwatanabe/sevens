@@ -1,4 +1,4 @@
-import type { Suit, Rank } from "../app/types/game";
+import type { Suit, Rank } from "@/types/game";
 
 export const SUITS: Suit[] = ["spades", "hearts", "diamonds", "clubs"];
 export const RANKS: Rank[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];

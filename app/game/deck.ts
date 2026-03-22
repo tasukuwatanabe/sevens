@@ -1,4 +1,4 @@
-import type { Card } from "../app/types/game";
+import type { Card } from "@/types/game";
 import { SUITS, RANKS } from "./constants";
 
 export function createDeck(): Card[] {
