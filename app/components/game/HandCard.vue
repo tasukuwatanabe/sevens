@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { Card } from "../../types/game";
-import { rankLabel, suitSymbol, isRedSuit } from "../../utils/card";
+import { rankLabel, suitSymbol, suitLabel, isRedSuit } from "../../utils/card";
 
 const props = defineProps<{
   card: Card;
@@ -18,7 +18,7 @@ const isRed = computed(() => isRedSuit(props.card.suit));
 
 <template>
   <button
-    class="w-14 h-20 rounded-lg border-2 flex flex-col items-center justify-center text-base font-bold transition-all"
+    class="w-10 h-14 sm:w-14 sm:h-20 rounded-lg border-2 flex flex-col items-center justify-center text-sm sm:text-base font-bold transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 focus-visible:outline-none"
     :class="[
       disabled
         ? 'opacity-40 cursor-not-allowed border-gray-200 bg-gray-50'
@@ -31,9 +31,10 @@ const isRed = computed(() => isRedSuit(props.card.suit));
             : 'border-gray-300 bg-white text-gray-500 cursor-not-allowed',
     ]"
     :disabled="disabled || !isValid"
+    :aria-label="`${suitLabel(card.suit)} ${rankLabel(card.rank)}${!isValid ? '（置けない）' : ''}`"
     @click="emit('play', card)"
   >
-    <span>{{ rankLabel(card.rank) }}</span>
-    <span>{{ suitSymbol(card.suit) }}</span>
+    <span aria-hidden="true">{{ rankLabel(card.rank) }}</span>
+    <span aria-hidden="true">{{ suitSymbol(card.suit) }}</span>
   </button>
 </template>

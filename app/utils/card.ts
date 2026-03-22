@@ -23,8 +23,19 @@ const RANK_LABELS: Record<Rank, string> = {
   13: "K",
 };
 
+const SUIT_LABELS: Record<Suit, string> = {
+  spades: "スペード",
+  hearts: "ハート",
+  diamonds: "ダイヤ",
+  clubs: "クラブ",
+};
+
 export function suitSymbol(suit: Suit) {
   return SUIT_SYMBOLS[suit];
+}
+
+export function suitLabel(suit: Suit): string {
+  return SUIT_LABELS[suit];
 }
 
 export function rankLabel(rank: Rank) {
