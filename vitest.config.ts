@@ -1,10 +1,14 @@
 import { defineConfig } from "vite-plus/test/config";
 import vue from "@vitejs/plugin-vue";
+import { resolve } from "path";
+
+const alias = { "@": resolve(__dirname, "app") };
 
 export default defineConfig({
   test: {
     projects: [
       {
+        resolve: { alias },
         test: {
           name: "unit",
           include: ["tests/unit/**/*.test.ts"],
@@ -12,6 +16,7 @@ export default defineConfig({
         },
       },
       {
+        resolve: { alias },
         plugins: [vue()],
         test: {
           name: "browser",
@@ -21,6 +26,7 @@ export default defineConfig({
         },
       },
       {
+        resolve: { alias },
         test: {
           name: "integration",
           include: ["tests/integration/**/*.test.ts"],
