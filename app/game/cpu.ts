@@ -1,49 +1,39 @@
 import type { Card, Player, Board } from "@/types/game";
 import { getValidCards, isValidPlay } from "./rules";
 import { areCardsEqual } from "@/utils/card";
+import { updateBoard } from "./state";
 
-type CpuAction = { type: "place"; card: Card } | { type: "pass" };
+export type CpuAction = { type: "place"; card: Card } | { type: "pass" };
 
-function scoreCard(card: Card, hand: Card[], board: Board): number {
-  let score = 0;
-
-  const newBoard = {
-    ...board,
-    [card.suit]: {
-      ...board[card.suit],
-      low: card.rank < board[card.suit].low ? card.rank : board[card.suit].low,
-      high: card.rank > board[card.suit].high ? card.rank : board[card.suit].high,
-    },
-  };
+export function countNewlyValidCards(card: Card, hand: Card[], board: Board): number {
+  const newBoard = updateBoard(board, card);
   const remainingHand = hand.filter((c) => !areCardsEqual(c, card));
-  const newlyValid = remainingHand.filter((c) => isValidPlay(c, newBoard));
-  score += newlyValid.length * 10;
+  return remainingHand.filter((c) => isValidPlay(c, newBoard)).length;
+}
 
-  const hasAdjacentInHand = hand.some(
+export function hasNoAdjacentCard(card: Card, hand: Card[]): boolean {
+  return !hand.some(
     (c) =>
       c !== card && c.suit === card.suit && (c.rank === card.rank - 1 || c.rank === card.rank + 1),
   );
-  if (!hasAdjacentInHand) score += 5;
+}
 
-  const distanceFromEdge = Math.min(card.rank - 1, 13 - card.rank);
-  score += Math.max(0, 3 - distanceFromEdge);
+export function calcDistanceScore(card: Card): number {
+  return Math.max(0, 3 - Math.min(card.rank - 1, 13 - card.rank));
+}
 
-  return score;
+function scoreCard(card: Card, hand: Card[], board: Board): number {
+  return (
+    countNewlyValidCards(card, hand, board) * 10 +
+    (hasNoAdjacentCard(card, hand) ? 5 : 0) +
+    calcDistanceScore(card)
+  );
 }
 
 function selectBestCard(validCards: Card[], hand: Card[], board: Board): Card {
-  let best = validCards[0]!;
-  let bestScore = scoreCard(best, hand, board);
-
-  for (let i = 1; i < validCards.length; i++) {
-    const score = scoreCard(validCards[i]!, hand, board);
-    if (score > bestScore) {
-      best = validCards[i]!;
-      bestScore = score;
-    }
-  }
-
-  return best;
+  return validCards.reduce((best, card) =>
+    scoreCard(card, hand, board) > scoreCard(best, hand, board) ? card : best,
+  );
 }
 
 export function decideCpuAction(player: Player, board: Board): CpuAction {

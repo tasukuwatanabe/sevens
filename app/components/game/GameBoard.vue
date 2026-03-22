@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SUITS } from "@/game/constants";
+import { SUITS, MAX_PASSES } from "@/game/constants";
 import { useGame } from "@/composables/useGame";
 
 const {
@@ -10,7 +10,7 @@ const {
   cpuThinking,
   cpuPlayers,
   humanPlayer,
-  statusMessage,
+  gameStatus,
   currentPlayer,
   playCard,
   pass,
@@ -36,15 +36,15 @@ const {
     </div>
 
     <div class="bg-green-800 rounded-xl p-2 sm:p-3 flex flex-col gap-1 sm:gap-1.5">
-      <BoardRow v-for="suit in SUITS" :key="suit" :suit="suit" :board-suit="state.board[suit]" />
+      <BoardRow v-for="suit in SUITS" :key="suit" :board-suit="state.board[suit]" />
     </div>
 
-    <GameStatus :message="statusMessage" :is-human-turn="isHumanTurn" />
+    <GameStatus :status="gameStatus" :player-name="currentPlayer.name" />
 
     <div class="bg-green-800 rounded-xl p-2 sm:p-3">
       <div class="text-xs text-center mb-2 text-green-300">
         {{ humanPlayer.name }}の手札（{{ humanPlayer.hand.length }}枚） — パス残り
-        {{ 3 - humanPlayer.passesUsed }}/3
+        {{ MAX_PASSES - humanPlayer.passesUsed }}/{{ MAX_PASSES }}
       </div>
       <PlayerHand
         :hand="humanPlayer.hand"

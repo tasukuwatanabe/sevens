@@ -15,7 +15,7 @@ function removeFromHand(hand: Card[], card: Card): Card[] {
   return [...hand.slice(0, idx), ...hand.slice(idx + 1)];
 }
 
-function updateBoard(board: Board, card: Card): Board {
+export function updateBoard(board: Board, card: Card): Board {
   const row = board[card.suit];
   return {
     ...board,
@@ -38,10 +38,10 @@ export function initGame(): GameState {
   const hands = dealCards(remaining, PLAYER_COUNT);
 
   const players: Player[] = [
-    { id: "human", type: "human", name: "あなた", hand: hands[0]!, passesUsed: 0 },
-    { id: "cpu1", type: "cpu", name: "CPU 1", hand: hands[1]!, passesUsed: 0 },
-    { id: "cpu2", type: "cpu", name: "CPU 2", hand: hands[2]!, passesUsed: 0 },
-    { id: "cpu3", type: "cpu", name: "CPU 3", hand: hands[3]!, passesUsed: 0 },
+    { id: "human", type: "human", name: "あなた", hand: hands.at(0) ?? [], passesUsed: 0 },
+    { id: "cpu1", type: "cpu", name: "CPU 1", hand: hands.at(1) ?? [], passesUsed: 0 },
+    { id: "cpu2", type: "cpu", name: "CPU 2", hand: hands.at(2) ?? [], passesUsed: 0 },
+    { id: "cpu3", type: "cpu", name: "CPU 3", hand: hands.at(3) ?? [], passesUsed: 0 },
   ];
 
   return {
