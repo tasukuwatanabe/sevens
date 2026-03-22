@@ -1,6 +1,6 @@
 import type { Card, Player, Board } from "@/types/game";
-import { getValidCards, canPass } from "./rules";
-import { isValidPlay } from "./rules";
+import { getValidCards, isValidPlay } from "./rules";
+import { areCardsEqual } from "@/utils/card";
 
 type CpuAction = { type: "place"; card: Card } | { type: "pass" };
 
@@ -15,7 +15,7 @@ function scoreCard(card: Card, hand: Card[], board: Board): number {
       high: card.rank > board[card.suit].high ? card.rank : board[card.suit].high,
     },
   };
-  const remainingHand = hand.filter((c) => !(c.suit === card.suit && c.rank === card.rank));
+  const remainingHand = hand.filter((c) => !areCardsEqual(c, card));
   const newlyValid = remainingHand.filter((c) => isValidPlay(c, newBoard));
   score += newlyValid.length * 10;
 
@@ -50,7 +50,6 @@ export function decideCpuAction(player: Player, board: Board): CpuAction {
   const validCards = getValidCards(player.hand, board);
 
   if (validCards.length === 0) {
-    if (canPass(player)) return { type: "pass" };
     return { type: "pass" };
   }
 

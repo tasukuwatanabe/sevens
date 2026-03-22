@@ -1,6 +1,7 @@
 import type { Card, GameState, PlayerId, Board, Player } from "@/types/game";
 import { SUITS, INITIAL_RANK, PLAYER_COUNT } from "./constants";
 import { createDeck, shuffleDeck, dealCards } from "./deck";
+import { areCardsEqual } from "@/utils/card";
 
 function createInitialBoard(): Board {
   return Object.fromEntries(
@@ -9,7 +10,7 @@ function createInitialBoard(): Board {
 }
 
 function removeFromHand(hand: Card[], card: Card): Card[] {
-  const idx = hand.findIndex((c) => c.suit === card.suit && c.rank === card.rank);
+  const idx = hand.findIndex((c) => areCardsEqual(c, card));
   if (idx === -1) return hand;
   return [...hand.slice(0, idx), ...hand.slice(idx + 1)];
 }
@@ -24,6 +25,10 @@ function updateBoard(board: Board, card: Card): Board {
       high: card.rank > row.high ? card.rank : row.high,
     },
   };
+}
+
+function updatePlayer(players: Player[], index: number, updates: Partial<Player>): Player[] {
+  return players.map((p, i) => (i === index ? { ...p, ...updates } : p));
 }
 
 export function initGame(): GameState {
@@ -53,10 +58,8 @@ export function placeCard(state: GameState, card: Card): GameState {
   const player = state.players[playerIndex]!;
   const newHand = removeFromHand(player.hand, card);
   const newBoard = updateBoard(state.board, card);
-
-  const newPlayers = state.players.map((p, i) => (i === playerIndex ? { ...p, hand: newHand } : p));
-
-  const winner = newHand.length === 0 ? player.id : null;
+  const newPlayers = updatePlayer(state.players, playerIndex, { hand: newHand });
+  const winner: PlayerId | null = newHand.length === 0 ? player.id : null;
 
   return {
     ...state,
@@ -71,19 +74,13 @@ export function placeCard(state: GameState, card: Card): GameState {
 export function passTurn(state: GameState): GameState {
   const playerIndex = state.currentPlayerIndex;
   const player = state.players[playerIndex]!;
-
-  const newPlayers = state.players.map((p, i) =>
-    i === playerIndex ? { ...p, passesUsed: p.passesUsed + 1 } : p,
-  );
+  const newPlayers = updatePlayer(state.players, playerIndex, {
+    passesUsed: player.passesUsed + 1,
+  });
 
   return {
     ...state,
     players: newPlayers,
     currentPlayerIndex: (playerIndex + 1) % PLAYER_COUNT,
   };
-}
-
-export function checkWinner(state: GameState): PlayerId | null {
-  const winner = state.players.find((p) => p.hand.length === 0);
-  return winner?.id ?? null;
 }
