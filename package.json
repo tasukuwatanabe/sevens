@@ -8,6 +8,9 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "type-check": "nuxt typecheck",
+    "fmt": "vp fmt",
+    "fmt:check": "vp fmt --check",
     "lint": "vp check",
     "test": "vp test run"
   },
@@ -22,7 +25,6 @@
     "@testing-library/vue": "^8.1.0",
     "@vite-pwa/nuxt": "^1.1.1",
     "@vitejs/plugin-vue": "^6.0.5",
-    "@vitest/browser-playwright": "^4.1.0",
     "playwright": "^1.58.2",
     "vite-plus": "latest",
     "vitest": "npm:@voidzero-dev/vite-plus-test@^0.1.13"
