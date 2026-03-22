@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import type { Rank, Suit } from "../../types/game";
 import { rankLabel, suitSymbol, isRedSuit } from "../../utils/card";
 

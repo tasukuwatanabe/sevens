@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { SUITS } from "../../../game/constants";
 import { useGame } from "../../composables/useGame";
 

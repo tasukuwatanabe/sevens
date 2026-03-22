@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import type { BoardSuit, Suit } from "../../types/game";
 import { RANKS } from "../../../game/constants";
 import { suitSymbol, isRedSuit } from "../../utils/card";

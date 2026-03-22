@@ -1,4 +1,5 @@
 import { defineConfig } from "vite-plus/test/config";
+import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
   test: {
@@ -11,20 +12,19 @@ export default defineConfig({
         },
       },
       {
+        plugins: [vue()],
         test: {
           name: "browser",
           include: ["tests/browser/**/*.test.ts"],
-          browser: {
-            enabled: true,
-            instances: [{ browser: "chromium" }],
-          },
+          environment: "happy-dom",
+          setupFiles: ["tests/browser/setup.ts"],
         },
       },
       {
         test: {
           name: "integration",
           include: ["tests/integration/**/*.test.ts"],
-          environment: "jsdom",
+          environment: "node",
         },
       },
     ],
