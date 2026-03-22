@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   lint:
-    name: Lint & Format & TypeCheck
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
