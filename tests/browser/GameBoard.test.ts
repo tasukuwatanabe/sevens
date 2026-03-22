@@ -12,6 +12,7 @@ describe("CpuPlayer コンポーネント", () => {
         passesUsed: 1,
         isCurrentTurn: false,
         isThinking: false,
+        playerIndex: 1,
       },
     });
     expect(result.getByText("CPU 1")).toBeTruthy();
@@ -25,6 +26,7 @@ describe("CpuPlayer コンポーネント", () => {
         passesUsed: 1,
         isCurrentTurn: false,
         isThinking: false,
+        playerIndex: 1,
       },
     });
     expect(within(container as HTMLElement).getByText("8枚")).toBeTruthy();
@@ -32,14 +34,28 @@ describe("CpuPlayer コンポーネント", () => {
 
   it("isCurrentTurn=trueの時ハイライトクラスが付く", () => {
     const { container } = render(CpuPlayer, {
-      props: { name: "CPU 2", handCount: 5, passesUsed: 0, isCurrentTurn: true, isThinking: false },
+      props: {
+        name: "CPU 2",
+        handCount: 5,
+        passesUsed: 0,
+        isCurrentTurn: true,
+        isThinking: false,
+        playerIndex: 2,
+      },
     });
     expect(container.firstChild).toHaveClass("border-blue-400");
   });
 
   it("isThinking=trueの時「考え中…」を表示する", () => {
     const result = render(CpuPlayer, {
-      props: { name: "CPU 3", handCount: 3, passesUsed: 0, isCurrentTurn: true, isThinking: true },
+      props: {
+        name: "CPU 3",
+        handCount: 3,
+        passesUsed: 0,
+        isCurrentTurn: true,
+        isThinking: true,
+        playerIndex: 3,
+      },
     });
     expect(result.getByText("考え中…")).toBeTruthy();
   });
