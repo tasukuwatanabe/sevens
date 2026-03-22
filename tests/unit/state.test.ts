@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "vite-plus/test";
 import { initGame, placeCard, passTurn } from "@/game/state";
 import type { Card } from "@/types/game";
 

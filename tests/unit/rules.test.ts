@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "vite-plus/test";
 import { isValidPlay, getValidCards, canPass } from "@/game/rules";
 import type { Board, Player } from "@/types/game";
 

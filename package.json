@@ -8,10 +8,9 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "type-check": "nuxt typecheck",
-    "fmt": "vp fmt",
-    "fmt:check": "vp fmt --check",
+    "prepare": "vp config",
     "lint": "vp check",
+    "lint:fix": "vp check --fix",
     "test": "vp test run"
   },
   "dependencies": {
@@ -20,18 +19,13 @@
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.14.0",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/vue": "^8.1.0",
     "@vite-pwa/nuxt": "^1.1.1",
-    "@vitejs/plugin-vue": "^6.0.5",
-    "playwright": "^1.58.2",
-    "vite-plus": "latest",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@^0.1.13",
-    "vue-tsc": "^3.2.6"
+    "vite-plus": "latest"
   },
   "packageManager": "pnpm@10.32.1",
   "pnpm": {
     "overrides": {
+      "vite": "npm:@voidzero-dev/vite-plus-core@latest",
       "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
     }
   }
