@@ -5,7 +5,7 @@ import { getValidCards, canPass } from "../../game/rules";
 import { useLocalStorage } from "./useLocalStorage";
 
 const STORAGE_KEY = "sevens-game-state";
-const CPU_THINK_MS = 800;
+const CPU_THINK_MS = 1500;
 
 function sleep(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms));
