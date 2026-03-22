@@ -17,7 +17,7 @@ const color = computed(() => CPU_PLAYER_COLORS[props.playerIndex] ?? CPU_PLAYER_
 <template>
   <div
     class="flex flex-col items-center gap-1 px-2 py-1 sm:px-3 sm:py-2 rounded-lg border"
-    :class="isCurrentTurn ? [color.border, color.bg] : 'border-gray-200 bg-gray-50'"
+    :class="isCurrentTurn || isThinking ? [color.border, color.bg] : 'border-gray-200 bg-gray-50'"
     :aria-current="isCurrentTurn ? 'true' : undefined"
   >
     <div class="text-xs font-semibold text-gray-700">{{ name }}</div>

@@ -14,6 +14,7 @@ function sleep(ms: number) {
 export function useGame() {
   const state = useLocalStorage<GameState>(STORAGE_KEY, initGame());
   const cpuThinking = ref(false);
+  const thinkingPlayerId = ref<string | null>(null);
 
   const currentPlayer = computed(() => state.value.players[state.value.currentPlayerIndex]!);
   const isHumanTurn = computed(() => currentPlayer.value.type === "human");
@@ -57,15 +58,19 @@ export function useGame() {
     if (player.type !== "cpu") return;
 
     cpuThinking.value = true;
-    await sleep(CPU_THINK_MS);
-
-    const action = decideCpuAction(player, state.value.board);
-    if (action.type === "place") {
-      state.value = placeCard(state.value, action.card);
-    } else {
-      state.value = passTurn(state.value);
+    thinkingPlayerId.value = player.id;
+    try {
+      await sleep(CPU_THINK_MS);
+      const action = decideCpuAction(player, state.value.board);
+      if (action.type === "place") {
+        state.value = placeCard(state.value, action.card);
+      } else {
+        state.value = passTurn(state.value);
+      }
+    } finally {
+      cpuThinking.value = false;
+      thinkingPlayerId.value = null;
     }
-    cpuThinking.value = false;
   }
 
   watch(
@@ -85,6 +90,7 @@ export function useGame() {
     validCards,
     canPassTurn,
     cpuThinking,
+    thinkingPlayerId,
     cpuPlayers,
     humanPlayer,
     gameStatus,

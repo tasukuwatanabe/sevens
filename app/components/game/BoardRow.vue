@@ -24,7 +24,7 @@ function isPlaced(rank: number) {
     >
       {{ suitSymbol(boardSuit.suit) }}
     </span>
-    <div class="flex gap-0 sm:gap-0.5">
+    <div class="flex w-full gap-px sm:w-auto sm:gap-0.5">
       <CardSlot
         v-for="rank in RANKS"
         :key="rank"

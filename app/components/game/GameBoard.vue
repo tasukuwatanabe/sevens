@@ -8,6 +8,7 @@ const {
   validCards,
   canPassTurn,
   cpuThinking,
+  thinkingPlayerId,
   cpuPlayers,
   humanPlayer,
   gameStatus,
@@ -30,7 +31,7 @@ const {
         :hand-count="cpu.hand.length"
         :passes-used="cpu.passesUsed"
         :is-current-turn="currentPlayer.id === cpu.id"
-        :is-thinking="cpuThinking && currentPlayer.id === cpu.id"
+        :is-thinking="thinkingPlayerId === cpu.id"
         :player-index="index"
       />
     </div>

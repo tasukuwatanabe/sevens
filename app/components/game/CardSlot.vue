@@ -15,13 +15,13 @@ const isRed = computed(() => isRedSuit(props.suit));
 
 <template>
   <div
-    class="w-7 h-10 sm:w-14 sm:h-20 rounded flex items-center justify-center text-xs sm:text-sm font-bold select-none"
+    class="flex-1 aspect-[7/10] max-w-10 sm:flex-none sm:max-w-none sm:aspect-auto sm:w-14 sm:h-20 rounded flex items-center justify-center text-xs sm:text-sm font-bold select-none"
     :class="[
       placed || isSeven
         ? isRed
           ? 'bg-white border-2 border-red-400 text-red-600'
           : 'bg-white border-2 border-gray-700 text-gray-900'
-        : 'bg-gray-100 border-2 border-dashed border-gray-400 text-gray-600',
+        : 'bg-gray-100 border-2 border-dashed border-gray-400 text-gray-600 opacity-40',
     ]"
     role="img"
     :aria-label="
