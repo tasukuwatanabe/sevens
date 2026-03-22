@@ -17,6 +17,25 @@ const {
   pass,
   resetGame,
 } = useGame();
+
+const showResetConfirm = ref(false);
+
+function handleResetRequest() {
+  if (state.value.phase === "playing") {
+    showResetConfirm.value = true;
+  } else {
+    resetGame();
+  }
+}
+
+function confirmReset() {
+  showResetConfirm.value = false;
+  resetGame();
+}
+
+function cancelReset() {
+  showResetConfirm.value = false;
+}
 </script>
 
 <template>
@@ -59,7 +78,7 @@ const {
       :can-pass="canPassTurn"
       :is-human-turn="isHumanTurn"
       @pass="pass"
-      @reset="resetGame"
+      @reset="handleResetRequest"
     />
 
     <GameOverModal
@@ -68,5 +87,7 @@ const {
       :players="state.players"
       @reset="resetGame"
     />
+
+    <ResetConfirmModal v-if="showResetConfirm" @confirm="confirmReset" @cancel="cancelReset" />
   </div>
 </template>
