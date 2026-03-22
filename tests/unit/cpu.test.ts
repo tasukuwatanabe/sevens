@@ -1,6 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { decideCpuAction } from "@/game/cpu";
-import type { Player, Board } from "@/types/game";
+import {
+  decideCpuAction,
+  countNewlyValidCards,
+  hasNoAdjacentCard,
+  calcDistanceScore,
+} from "@/game/cpu";
+import type { Card, Player, Board } from "@/types/game";
 
 function makeBoard(): Board {
   return {
@@ -21,6 +26,50 @@ function makePlayer(overrides: Partial<Player> = {}): Player {
     ...overrides,
   };
 }
+
+describe("countNewlyValidCards", () => {
+  it("カードを置くことで新たに有効になるカード数を返す", () => {
+    const board = makeBoard();
+    const card: Card = { suit: "spades", rank: 6 };
+    const hand: Card[] = [card, { suit: "spades", rank: 5 }];
+    expect(countNewlyValidCards(card, hand, board)).toBe(1);
+  });
+
+  it("新たに有効になるカードがなければ0を返す", () => {
+    const board = makeBoard();
+    const card: Card = { suit: "spades", rank: 6 };
+    const hand: Card[] = [card, { suit: "hearts", rank: 5 }];
+    expect(countNewlyValidCards(card, hand, board)).toBe(0);
+  });
+});
+
+describe("hasNoAdjacentCard", () => {
+  it("同スートの隣接カードがない場合はtrueを返す", () => {
+    const card: Card = { suit: "spades", rank: 6 };
+    const hand: Card[] = [card, { suit: "hearts", rank: 5 }];
+    expect(hasNoAdjacentCard(card, hand)).toBe(true);
+  });
+
+  it("同スートの隣接カードがある場合はfalseを返す", () => {
+    const card: Card = { suit: "spades", rank: 6 };
+    const hand: Card[] = [card, { suit: "spades", rank: 5 }];
+    expect(hasNoAdjacentCard(card, hand)).toBe(false);
+  });
+});
+
+describe("calcDistanceScore", () => {
+  it("エッジに近いカード(rank=1)は最大スコア3を返す", () => {
+    expect(calcDistanceScore({ suit: "spades", rank: 1 })).toBe(3);
+  });
+
+  it("エッジに近いカード(rank=13)は最大スコア3を返す", () => {
+    expect(calcDistanceScore({ suit: "spades", rank: 13 })).toBe(3);
+  });
+
+  it("中央付近のカード(rank=7)はスコア0を返す", () => {
+    expect(calcDistanceScore({ suit: "spades", rank: 7 })).toBe(0);
+  });
+});
 
 describe("decideCpuAction", () => {
   it("有効なカードがある場合はplaceを返す", () => {

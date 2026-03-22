@@ -46,23 +46,23 @@ describe("CpuPlayer コンポーネント", () => {
 });
 
 describe("GameStatus コンポーネント", () => {
-  it("メッセージを表示する", () => {
+  it("人間ターンのメッセージを表示する", () => {
     const result = render(GameStatus, {
-      props: { message: "あなたのターンです", isHumanTurn: true },
+      props: { status: "human-turn", playerName: "あなた" },
     });
-    expect(result.getByText("あなたのターンです")).toBeTruthy();
+    expect(result.getByText("あなたのターン")).toBeTruthy();
   });
 
-  it("isHumanTurn=trueの時緑背景クラスが付く", () => {
+  it("人間ターン時は緑背景クラスが付く", () => {
     const { container } = render(GameStatus, {
-      props: { message: "あなたのターン", isHumanTurn: true },
+      props: { status: "human-turn", playerName: "あなた" },
     });
     expect(container.firstChild).toHaveClass("bg-green-100");
   });
 
-  it("isHumanTurn=falseの時グレー背景クラスが付く", () => {
+  it("CPUターン時はグレー背景クラスが付く", () => {
     const { container } = render(GameStatus, {
-      props: { message: "CPUのターン", isHumanTurn: false },
+      props: { status: "cpu-turn", playerName: "CPU 1" },
     });
     expect(container.firstChild).toHaveClass("bg-gray-100");
   });
