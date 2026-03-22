@@ -27,13 +27,14 @@ const statusMessage = computed(() => {
 
     <div class="flex justify-center gap-3">
       <CpuPlayer
-        v-for="cpu in cpuPlayers"
+        v-for="(cpu, index) in cpuPlayers"
         :key="cpu.id"
         :name="cpu.name"
         :hand-count="cpu.hand.length"
         :passes-used="cpu.passesUsed"
         :is-current-turn="currentPlayer.id === cpu.id"
         :is-thinking="state.cpuThinking && currentPlayer.id === cpu.id"
+        :player-index="index"
       />
     </div>
 
