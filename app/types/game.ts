@@ -1,10 +1,9 @@
 export type Suit = "spades" | "hearts" | "diamonds" | "clubs";
 export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 
-export interface Card {
-  suit: Suit;
-  rank: Rank;
-}
+export type NormalCard = { suit: Suit; rank: Rank };
+export type JokerCard = { isJoker: true };
+export type Card = NormalCard | JokerCard;
 
 export type PlayerId = "human" | "cpu1" | "cpu2" | "cpu3";
 export type PlayerType = "human" | "cpu";
@@ -32,7 +31,8 @@ export type GameStatusCode =
   | "human-place"
   | "human-must-pass"
   | "human-turn"
-  | "cpu-turn";
+  | "cpu-turn"
+  | "human-joker-mode";
 
 export interface GameState {
   phase: GamePhase;

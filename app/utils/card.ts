@@ -1,4 +1,4 @@
-import type { Suit, Rank, Card } from "@/types/game";
+import type { Suit, Rank, Card, NormalCard, JokerCard } from "@/types/game";
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
   spades: "♠",
@@ -30,6 +30,10 @@ const SUIT_LABELS: Record<Suit, string> = {
   clubs: "クラブ",
 };
 
+export function isJokerCard(card: Card): card is JokerCard {
+  return (card as JokerCard).isJoker === true;
+}
+
 export function suitSymbol(suit: Suit) {
   return SUIT_SYMBOLS[suit];
 }
@@ -47,5 +51,9 @@ export function isRedSuit(suit: Suit) {
 }
 
 export function areCardsEqual(a: Card, b: Card): boolean {
-  return a.suit === b.suit && a.rank === b.rank;
+  if (isJokerCard(a) || isJokerCard(b)) return isJokerCard(a) && isJokerCard(b);
+  return (
+    (a as NormalCard).suit === (b as NormalCard).suit &&
+    (a as NormalCard).rank === (b as NormalCard).rank
+  );
 }
