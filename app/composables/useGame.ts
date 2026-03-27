@@ -46,6 +46,7 @@ export function useGame() {
 
   function playCard(card: Card) {
     if (!isHumanTurn.value || isJokerCard(card)) return;
+    jokerMode.value = false;
     state.value = placeCard(state.value, card as NormalCard);
   }
 

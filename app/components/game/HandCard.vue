@@ -57,7 +57,7 @@ function handleClick() {
   <button
     class="w-10 h-14 sm:w-14 sm:h-20 rounded-lg border-2 flex flex-col items-center justify-center text-sm sm:text-base font-bold transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 focus-visible:outline-none"
     :class="buttonClasses"
-    :disabled="isJoker ? disabled || isJokerMode : disabled || !isValid"
+    :disabled="isJoker ? disabled || isJokerMode : disabled || !isValid || isJokerMode"
     :aria-label="
       isJoker
         ? 'ジョーカー'
