@@ -1,7 +1,7 @@
-import type { Card, GameState, PlayerId, Board, Player } from "@/types/game";
+import type { Card, NormalCard, GameState, PlayerId, Board, Player } from "@/types/game";
 import { SUITS, INITIAL_RANK, PLAYER_COUNT } from "./constants";
-import { createDeck, shuffleDeck, dealCards } from "./deck";
-import { areCardsEqual } from "@/utils/card";
+import { createDeck, shuffleDeck, dealCards, JOKER_CARD } from "./deck";
+import { areCardsEqual, isJokerCard } from "@/utils/card";
 
 function createInitialBoard(): Board {
   return Object.fromEntries(
@@ -15,7 +15,7 @@ function removeFromHand(hand: Card[], card: Card): Card[] {
   return [...hand.slice(0, idx), ...hand.slice(idx + 1)];
 }
 
-export function updateBoard(board: Board, card: Card): Board {
+export function updateBoard(board: Board, card: NormalCard): Board {
   const row = board[card.suit];
   return {
     ...board,
@@ -33,7 +33,9 @@ function updatePlayer(players: Player[], index: number, updates: Partial<Player>
 
 export function initGame(): GameState {
   const deck = shuffleDeck(createDeck());
-  const sevenIndices = deck.map((card, i) => (card.rank === 7 ? i : -1)).filter((i) => i !== -1);
+  const sevenIndices = deck
+    .map((card, i) => (!isJokerCard(card) && (card as NormalCard).rank === 7 ? i : -1))
+    .filter((i) => i !== -1);
   const remaining = deck.filter((_, i) => !sevenIndices.includes(i));
   const hands = dealCards(remaining, PLAYER_COUNT);
 
@@ -77,7 +79,7 @@ export function initGame(): GameState {
   };
 }
 
-export function placeCard(state: GameState, card: Card): GameState {
+export function placeCard(state: GameState, card: NormalCard): GameState {
   const playerIndex = state.currentPlayerIndex;
   const player = state.players[playerIndex]!;
   const newHand = removeFromHand(player.hand, card);
@@ -92,6 +94,41 @@ export function placeCard(state: GameState, card: Card): GameState {
     board: newBoard,
     players: newPlayers,
     currentPlayerIndex: (playerIndex + 1) % PLAYER_COUNT,
+    winner,
+    phase: winner ? "gameover" : "playing",
+  };
+}
+
+export function placeJoker(state: GameState, targetPos: NormalCard): GameState {
+  const holderIndex = state.currentPlayerIndex;
+  const holder = state.players[holderIndex]!;
+
+  const holderNewHand = holder.hand.filter((c) => !isJokerCard(c));
+
+  const recipientIndex = state.players.findIndex((p) =>
+    p.hand.some((c) => !isJokerCard(c) && areCardsEqual(c, targetPos)),
+  );
+
+  const newBoard = updateBoard(state.board, targetPos);
+
+  let newPlayers = updatePlayer(state.players, holderIndex, { hand: holderNewHand });
+
+  if (recipientIndex !== -1 && recipientIndex !== holderIndex) {
+    const recipient = state.players[recipientIndex]!;
+    const recipientNewHand = [
+      ...recipient.hand.filter((c) => !areCardsEqual(c, targetPos)),
+      JOKER_CARD,
+    ];
+    newPlayers = updatePlayer(newPlayers, recipientIndex, { hand: recipientNewHand });
+  }
+
+  const winner: PlayerId | null = holderNewHand.length === 0 ? holder.id : null;
+
+  return {
+    ...state,
+    board: newBoard,
+    players: newPlayers,
+    currentPlayerIndex: (holderIndex + 1) % PLAYER_COUNT,
     winner,
     phase: winner ? "gameover" : "playing",
   };

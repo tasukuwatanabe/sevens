@@ -1,8 +1,11 @@
-import type { Card } from "@/types/game";
+import type { Card, JokerCard } from "@/types/game";
 import { SUITS, RANKS } from "./constants";
 
+export const JOKER_CARD: JokerCard = { isJoker: true };
+
 export function createDeck(): Card[] {
-  return SUITS.flatMap((suit) => RANKS.map((rank) => ({ suit, rank })));
+  const normalCards = SUITS.flatMap((suit) => RANKS.map((rank) => ({ suit, rank })));
+  return [...normalCards, JOKER_CARD];
 }
 
 export function shuffleDeck(deck: Card[]): Card[] {
