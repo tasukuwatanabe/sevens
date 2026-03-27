@@ -38,6 +38,7 @@ export function useGame() {
     if (isHumanTurn.value) {
       if (jokerMode.value) return "human-joker-mode";
       if (validCards.value.length > 0) return "human-place";
+      if (humanHasJoker.value && canPassTurn.value) return "human-joker-or-pass";
       if (canPassTurn.value) return "human-must-pass";
       return "human-turn";
     }

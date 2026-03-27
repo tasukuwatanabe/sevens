@@ -30,6 +30,7 @@ export type GameStatusCode =
   | "cpu-thinking"
   | "human-place"
   | "human-must-pass"
+  | "human-joker-or-pass"
   | "human-turn"
   | "cpu-turn"
   | "human-joker-mode";
