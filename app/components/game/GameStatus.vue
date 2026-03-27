@@ -13,13 +13,15 @@ const STATUS_MESSAGES: Record<GameStatusCode, (name: string) => string> = {
   "human-must-pass": () => "置けるカードがありません。パスしてください",
   "human-turn": () => "あなたのターン",
   "cpu-turn": (name) => `${name}のターン`,
+  "human-joker-mode": () => "ジョーカーを置く場所を選んでください",
 };
 
 const isHumanTurn = computed(
   () =>
     props.status === "human-place" ||
     props.status === "human-must-pass" ||
-    props.status === "human-turn",
+    props.status === "human-turn" ||
+    props.status === "human-joker-mode",
 );
 
 const message = computed(() => STATUS_MESSAGES[props.status](props.playerName));

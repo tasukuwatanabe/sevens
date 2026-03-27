@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SUITS, MAX_PASSES } from "@/game/constants";
 import { useGame } from "@/composables/useGame";
+import type { Suit, Rank, NormalCard } from "@/types/game";
 
 const {
   state,
@@ -13,9 +14,16 @@ const {
   humanPlayer,
   gameStatus,
   currentPlayer,
+  jokerMode,
+  validJokerPositions,
+  showJokerNotification,
   playCard,
   pass,
   resetGame,
+  enterJokerMode,
+  cancelJokerMode,
+  placeJokerAtPosition,
+  dismissJokerNotification,
 } = useGame();
 
 const showResetConfirm = ref(false);
@@ -35,6 +43,10 @@ function confirmReset() {
 
 function cancelReset() {
   showResetConfirm.value = false;
+}
+
+function handleJokerPlace(suit: Suit, rank: Rank) {
+  placeJokerAtPosition({ suit, rank } as NormalCard);
 }
 </script>
 
@@ -56,7 +68,13 @@ function cancelReset() {
     </div>
 
     <div class="bg-green-800 rounded-xl p-2 sm:p-3 flex flex-col gap-1 sm:gap-1.5">
-      <BoardRow v-for="suit in SUITS" :key="suit" :board-suit="state.board[suit]" />
+      <BoardRow
+        v-for="suit in SUITS"
+        :key="suit"
+        :board-suit="state.board[suit]"
+        :joker-targets="validJokerPositions"
+        @joker-place="handleJokerPlace"
+      />
     </div>
 
     <GameStatus :status="gameStatus" :player-name="currentPlayer.name" />
@@ -70,16 +88,27 @@ function cancelReset() {
         :hand="humanPlayer.hand"
         :valid-cards="validCards"
         :disabled="!isHumanTurn || cpuThinking"
+        :joker-mode="jokerMode"
         @play="playCard"
+        @select-joker="enterJokerMode"
       />
     </div>
 
-    <ActionButtons
-      :can-pass="canPassTurn"
-      :is-human-turn="isHumanTurn"
-      @pass="pass"
-      @reset="handleResetRequest"
-    />
+    <div class="flex gap-2 justify-center flex-wrap">
+      <button
+        v-if="jokerMode"
+        class="px-4 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-gray-600 transition-colors"
+        @click="cancelJokerMode"
+      >
+        キャンセル
+      </button>
+      <ActionButtons
+        :can-pass="canPassTurn"
+        :is-human-turn="isHumanTurn && !jokerMode"
+        @pass="pass"
+        @reset="handleResetRequest"
+      />
+    </div>
 
     <GameOverModal
       v-if="state.phase === 'gameover' && state.winner"
@@ -89,5 +118,7 @@ function cancelReset() {
     />
 
     <ResetConfirmModal v-if="showResetConfirm" @confirm="confirmReset" @cancel="cancelReset" />
+
+    <JokerReceivedOverlay v-if="showJokerNotification" @close="dismissJokerNotification" />
   </div>
 </template>

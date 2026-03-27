@@ -1,17 +1,28 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { BoardSuit } from "@/types/game";
+import type { BoardSuit, NormalCard, Suit, Rank } from "@/types/game";
 import { RANKS } from "@/game/constants";
 import { suitSymbol, suitLabel, isRedSuit } from "@/utils/card";
 
 const props = defineProps<{
   boardSuit: BoardSuit;
+  jokerTargets?: NormalCard[];
+}>();
+
+const emit = defineEmits<{
+  "joker-place": [suit: Suit, rank: Rank];
 }>();
 
 const isRed = computed(() => isRedSuit(props.boardSuit.suit));
 
 function isPlaced(rank: number) {
   return rank >= props.boardSuit.low && rank <= props.boardSuit.high;
+}
+
+function isJokerTarget(rank: Rank) {
+  return (
+    props.jokerTargets?.some((t) => t.suit === props.boardSuit.suit && t.rank === rank) ?? false
+  );
 }
 </script>
 
@@ -32,6 +43,8 @@ function isPlaced(rank: number) {
         :suit="boardSuit.suit"
         :placed="isPlaced(rank)"
         :is-seven="rank === 7"
+        :is-joker-target="isJokerTarget(rank)"
+        @joker-place="(s, r) => emit('joker-place', s, r)"
       />
     </div>
   </div>

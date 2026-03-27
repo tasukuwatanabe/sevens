@@ -1,19 +1,27 @@
 <script setup lang="ts">
 import type { Card } from "@/types/game";
-import { areCardsEqual } from "@/utils/card";
+import { areCardsEqual, isJokerCard } from "@/utils/card";
 
 const props = defineProps<{
   hand: Card[];
   validCards: Card[];
   disabled: boolean;
+  jokerMode?: boolean;
 }>();
 
 const emit = defineEmits<{
   play: [card: Card];
+  "select-joker": [];
 }>();
 
 function isValid(card: Card) {
+  if (isJokerCard(card)) return true;
   return props.validCards.some((c) => areCardsEqual(c, card));
+}
+
+function cardKey(card: Card, i: number) {
+  if (isJokerCard(card)) return `joker-${i}`;
+  return `${(card as any).suit}-${(card as any).rank}-${i}`;
 }
 </script>
 
@@ -21,11 +29,13 @@ function isValid(card: Card) {
   <div class="flex flex-wrap gap-1 justify-center">
     <HandCard
       v-for="(card, i) in hand"
-      :key="`${card.suit}-${card.rank}-${i}`"
+      :key="cardKey(card, i)"
       :card="card"
       :is-valid="isValid(card)"
       :disabled="disabled"
+      :is-joker-mode="jokerMode"
       @play="emit('play', $event)"
+      @select-joker="emit('select-joker')"
     />
   </div>
 </template>
