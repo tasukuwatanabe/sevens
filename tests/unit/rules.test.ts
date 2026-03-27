@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vite-plus/test";
-import { isValidPlay, getValidCards, canPass } from "@/game/rules";
+import { isValidPlay, getValidCards, canPass, getValidJokerPositions } from "@/game/rules";
 import type { Board, Player } from "@/types/game";
+import { JOKER_CARD } from "@/game/deck";
 
 function makeBoard(overrides: Partial<Record<string, { low: number; high: number }>> = {}): Board {
   const defaults = {
@@ -76,6 +77,11 @@ describe("isValidPlay", () => {
     expect(isValidPlay({ suit: "hearts", rank: 6 }, board)).toBe(true);
     expect(isValidPlay({ suit: "hearts", rank: 8 }, board)).toBe(true);
   });
+
+  it("ジョーカーは通常のisValidPlayでは置けない", () => {
+    const board = makeBoard();
+    expect(isValidPlay(JOKER_CARD, board)).toBe(false);
+  });
 });
 
 describe("getValidCards", () => {
@@ -88,14 +94,22 @@ describe("getValidCards", () => {
     ];
     const valid = getValidCards(hand, board);
     expect(valid).toHaveLength(2);
-    expect(valid.some((c) => c.suit === "spades" && c.rank === 6)).toBe(true);
-    expect(valid.some((c) => c.suit === "hearts" && c.rank === 8)).toBe(true);
+    expect(valid.some((c) => (c as any).suit === "spades" && (c as any).rank === 6)).toBe(true);
+    expect(valid.some((c) => (c as any).suit === "hearts" && (c as any).rank === 8)).toBe(true);
   });
 
   it("有効なカードがない場合は空配列", () => {
     const board = makeBoard();
     const hand = [{ suit: "spades" as const, rank: 5 as const }];
     expect(getValidCards(hand, board)).toHaveLength(0);
+  });
+
+  it("ジョーカーは有効なカードとして返さない", () => {
+    const board = makeBoard();
+    const hand = [JOKER_CARD, { suit: "spades" as const, rank: 6 as const }];
+    const valid = getValidCards(hand, board);
+    expect(valid.some((c) => (c as any).isJoker)).toBe(false);
+    expect(valid).toHaveLength(1);
   });
 });
 
@@ -114,5 +128,38 @@ describe("canPass", () => {
 
   it("3回使用で不可", () => {
     expect(canPass(makePlayer(3))).toBe(false);
+  });
+});
+
+describe("getValidJokerPositions", () => {
+  it("初期ボードでは8位置（各スート2箇所）を返す", () => {
+    const board = makeBoard();
+    const positions = getValidJokerPositions(board);
+    expect(positions).toHaveLength(8);
+  });
+
+  it("low=1のスートは左側の位置がない", () => {
+    const board = makeBoard({ spades: { low: 1, high: 7 } });
+    const positions = getValidJokerPositions(board);
+    const spadesPositions = positions.filter((p) => p.suit === "spades");
+    expect(spadesPositions).toHaveLength(1);
+    expect(spadesPositions[0]!.rank).toBe(8);
+  });
+
+  it("high=13のスートは右側の位置がない", () => {
+    const board = makeBoard({ hearts: { low: 7, high: 13 } });
+    const positions = getValidJokerPositions(board);
+    const heartsPositions = positions.filter((p) => p.suit === "hearts");
+    expect(heartsPositions).toHaveLength(1);
+    expect(heartsPositions[0]!.rank).toBe(6);
+  });
+
+  it("返す位置はすべてNormalCard形式", () => {
+    const board = makeBoard();
+    const positions = getValidJokerPositions(board);
+    for (const pos of positions) {
+      expect(pos.suit).toBeDefined();
+      expect(pos.rank).toBeDefined();
+    }
   });
 });

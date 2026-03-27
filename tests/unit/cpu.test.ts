@@ -5,7 +5,8 @@ import {
   hasNoAdjacentCard,
   calcDistanceScore,
 } from "@/game/cpu";
-import type { Card, Player, Board } from "@/types/game";
+import type { NormalCard, Player, Board } from "@/types/game";
+import { JOKER_CARD } from "@/game/deck";
 
 function makeBoard(): Board {
   return {
@@ -30,30 +31,36 @@ function makePlayer(overrides: Partial<Player> = {}): Player {
 describe("countNewlyValidCards", () => {
   it("カードを置くことで新たに有効になるカード数を返す", () => {
     const board = makeBoard();
-    const card: Card = { suit: "spades", rank: 6 };
-    const hand: Card[] = [card, { suit: "spades", rank: 5 }];
+    const card: NormalCard = { suit: "spades", rank: 6 };
+    const hand = [card, { suit: "spades", rank: 5 } as NormalCard];
     expect(countNewlyValidCards(card, hand, board)).toBe(1);
   });
 
   it("新たに有効になるカードがなければ0を返す", () => {
     const board = makeBoard();
-    const card: Card = { suit: "spades", rank: 6 };
-    const hand: Card[] = [card, { suit: "hearts", rank: 5 }];
+    const card: NormalCard = { suit: "spades", rank: 6 };
+    const hand = [card, { suit: "hearts", rank: 5 } as NormalCard];
     expect(countNewlyValidCards(card, hand, board)).toBe(0);
   });
 });
 
 describe("hasNoAdjacentCard", () => {
   it("同スートの隣接カードがない場合はtrueを返す", () => {
-    const card: Card = { suit: "spades", rank: 6 };
-    const hand: Card[] = [card, { suit: "hearts", rank: 5 }];
+    const card: NormalCard = { suit: "spades", rank: 6 };
+    const hand = [card, { suit: "hearts", rank: 5 } as NormalCard];
     expect(hasNoAdjacentCard(card, hand)).toBe(true);
   });
 
   it("同スートの隣接カードがある場合はfalseを返す", () => {
-    const card: Card = { suit: "spades", rank: 6 };
-    const hand: Card[] = [card, { suit: "spades", rank: 5 }];
+    const card: NormalCard = { suit: "spades", rank: 6 };
+    const hand = [card, { suit: "spades", rank: 5 } as NormalCard];
     expect(hasNoAdjacentCard(card, hand)).toBe(false);
+  });
+
+  it("ジョーカーは隣接カードとして扱われない", () => {
+    const card: NormalCard = { suit: "spades", rank: 6 };
+    const hand = [card, JOKER_CARD];
+    expect(hasNoAdjacentCard(card, hand)).toBe(true);
   });
 });
 
@@ -74,13 +81,13 @@ describe("calcDistanceScore", () => {
 describe("decideCpuAction", () => {
   it("有効なカードがある場合はplaceを返す", () => {
     const player = makePlayer({ hand: [{ suit: "spades", rank: 6 }] });
-    const action = decideCpuAction(player, makeBoard());
+    const action = decideCpuAction(player, makeBoard(), []);
     expect(action.type).toBe("place");
   });
 
   it("placeの場合はcardが含まれる", () => {
     const player = makePlayer({ hand: [{ suit: "spades", rank: 6 }] });
-    const action = decideCpuAction(player, makeBoard());
+    const action = decideCpuAction(player, makeBoard(), []);
     if (action.type === "place") {
       expect(action.card).toEqual({ suit: "spades", rank: 6 });
     }
@@ -91,7 +98,7 @@ describe("decideCpuAction", () => {
       hand: [{ suit: "spades", rank: 5 }],
       passesUsed: 0,
     });
-    const action = decideCpuAction(player, makeBoard());
+    const action = decideCpuAction(player, makeBoard(), []);
     expect(action.type).toBe("pass");
   });
 
@@ -100,7 +107,7 @@ describe("decideCpuAction", () => {
       hand: [{ suit: "spades", rank: 5 }],
       passesUsed: 3,
     });
-    const action = decideCpuAction(player, makeBoard());
+    const action = decideCpuAction(player, makeBoard(), []);
     expect(action.type).toBe("pass");
   });
 
@@ -112,7 +119,7 @@ describe("decideCpuAction", () => {
         { suit: "diamonds", rank: 6 },
       ],
     });
-    const action = decideCpuAction(player, makeBoard());
+    const action = decideCpuAction(player, makeBoard(), []);
     expect(action.type).toBe("place");
     if (action.type === "place") {
       const validRankSuit = [
@@ -123,6 +130,44 @@ describe("decideCpuAction", () => {
       expect(
         validRankSuit.some((c) => c.suit === action.card.suit && c.rank === action.card.rank),
       ).toBe(true);
+    }
+  });
+
+  it("ジョーカーを持ち有効なカードがない場合はplace-jokerを返す", () => {
+    const player = makePlayer({
+      hand: [JOKER_CARD, { suit: "spades", rank: 5 }],
+    });
+    const humanPlayer = makePlayer({
+      id: "human",
+      type: "human",
+      hand: [{ suit: "spades", rank: 6 }],
+    });
+    const action = decideCpuAction(player, makeBoard(), [humanPlayer, player]);
+    expect(action.type).toBe("place-joker");
+  });
+
+  it("ジョーカーを持ちかつ有効な通常カードもある場合は通常カードを優先する", () => {
+    const player = makePlayer({
+      hand: [JOKER_CARD, { suit: "spades", rank: 6 }],
+    });
+    const action = decideCpuAction(player, makeBoard(), []);
+    expect(action.type).toBe("place");
+  });
+
+  it("place-jokerの場合は人間が持つカードの位置を優先する", () => {
+    const cpuPlayer = makePlayer({
+      id: "cpu1",
+      hand: [JOKER_CARD, { suit: "spades", rank: 5 }],
+    });
+    const humanPlayer = makePlayer({
+      id: "human",
+      type: "human",
+      hand: [{ suit: "hearts", rank: 8 }],
+    });
+    const board = makeBoard();
+    const action = decideCpuAction(cpuPlayer, board, [humanPlayer, cpuPlayer]);
+    if (action.type === "place-joker") {
+      expect(action.position).toEqual({ suit: "hearts", rank: 8 });
     }
   });
 });
