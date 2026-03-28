@@ -105,7 +105,6 @@ describe("placeJoker", () => {
     const holderIndex = state.players.findIndex((p) => p.hand.some(isJokerCard));
     if (holderIndex === -1) return;
 
-    const holder = state.players[holderIndex]!;
     const targetPos = { suit: "spades" as const, rank: 6 as const };
     const recipient = state.players.find(
       (p, i) =>

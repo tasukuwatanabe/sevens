@@ -1,5 +1,4 @@
 export default {
-  content: ["./app/game/**/*.{ts,js}"],
   safelist: [
     "border-blue-400",
     "bg-blue-50",
