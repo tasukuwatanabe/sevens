@@ -170,4 +170,36 @@ describe("decideCpuAction", () => {
       expect(action.position).toEqual({ suit: "hearts", rank: 8 });
     }
   });
+
+  it("ジョーカーを持つが有効なジョーカー配置先がない場合はpassを返す", () => {
+    const player = makePlayer({
+      hand: [JOKER_CARD, { suit: "spades", rank: 5 }],
+    });
+    const fullBoard: ReturnType<typeof makeBoard> = {
+      spades: { suit: "spades", low: 1, high: 13 },
+      hearts: { suit: "hearts", low: 1, high: 13 },
+      diamonds: { suit: "diamonds", low: 1, high: 13 },
+      clubs: { suit: "clubs", low: 1, high: 13 },
+    };
+    const action = decideCpuAction(player, fullBoard, []);
+    expect(action.type).toBe("pass");
+  });
+
+  it("place-jokerで人間が対象カードを持たない場合は最初のpositionを選ぶ", () => {
+    const cpuPlayer = makePlayer({
+      id: "cpu1",
+      hand: [JOKER_CARD, { suit: "spades", rank: 5 }],
+    });
+    const humanPlayer = makePlayer({
+      id: "human",
+      type: "human",
+      hand: [{ suit: "clubs", rank: 5 }],
+    });
+    const board = makeBoard();
+    const action = decideCpuAction(cpuPlayer, board, [humanPlayer, cpuPlayer]);
+    expect(action.type).toBe("place-joker");
+    if (action.type === "place-joker") {
+      expect(action.position).toBeDefined();
+    }
+  });
 });

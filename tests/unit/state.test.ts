@@ -171,6 +171,28 @@ describe("placeJoker", () => {
     const next = placeJoker(state, { suit: "spades", rank: 6 });
     expect(next.currentPlayerIndex).toBe(1);
   });
+
+  it("ターゲットのカードを誰も持っていない場合もボードは更新される", () => {
+    const state = initGame();
+    state.players[0]!.hand = [JOKER_CARD];
+    state.players[1]!.hand = [];
+    state.players[2]!.hand = [];
+    state.players[3]!.hand = [];
+
+    const next = placeJoker(state, { suit: "spades", rank: 6 });
+    expect(next.board.spades.low).toBe(6);
+    expect(next.players[0]!.hand.some(isJokerCard)).toBe(false);
+  });
+
+  it("ジョーカーを出しても手札が残る場合はgameoverにならない", () => {
+    const state = initGame();
+    state.players[0]!.hand = [JOKER_CARD, { suit: "clubs", rank: 1 }];
+    state.players[1]!.hand = [{ suit: "spades", rank: 6 }];
+
+    const next = placeJoker(state, { suit: "spades", rank: 6 });
+    expect(next.phase).toBe("playing");
+    expect(next.winner).toBeNull();
+  });
 });
 
 describe("passTurn", () => {

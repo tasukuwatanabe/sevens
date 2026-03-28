@@ -162,4 +162,20 @@ describe("getValidJokerPositions", () => {
       expect(pos.rank).toBeDefined();
     }
   });
+
+  it("low=1かつhigh=13のスートは位置を返さない", () => {
+    const board = makeBoard({ spades: { low: 1, high: 13 } });
+    const positions = getValidJokerPositions(board);
+    expect(positions.filter((p) => p.suit === "spades")).toHaveLength(0);
+  });
+
+  it("全スートが完全に埋まった場合は空配列", () => {
+    const board = makeBoard({
+      spades: { low: 1, high: 13 },
+      hearts: { low: 1, high: 13 },
+      diamonds: { low: 1, high: 13 },
+      clubs: { low: 1, high: 13 },
+    });
+    expect(getValidJokerPositions(board)).toHaveLength(0);
+  });
 });
