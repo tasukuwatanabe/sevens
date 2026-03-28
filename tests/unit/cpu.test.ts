@@ -206,4 +206,45 @@ describe("decideCpuAction", () => {
       expect(action.position).toBeDefined();
     }
   });
+
+  it("ジョーカー＋コンボカードがあり通常カードがない場合はplace-joker-with-cardを返す", () => {
+    const player = makePlayer({
+      // rank: 9 は初期ボード（high=7）の high+2=9 に相当するコンボ候補
+      hand: [JOKER_CARD, { suit: "spades", rank: 9 }],
+    });
+    const action = decideCpuAction(player, makeBoard(), [player]);
+    expect(action.type).toBe("place-joker-with-card");
+    if (action.type === "place-joker-with-card") {
+      expect(action.jokerPos).toEqual({ suit: "spades", rank: 8 });
+      expect(action.companionCard).toEqual({ suit: "spades", rank: 9 });
+    }
+  });
+
+  it("通常カードがある場合はコンボより通常カードを優先する", () => {
+    const player = makePlayer({
+      // rank: 8 は有効牌（high+1）、rank: 9 はコンボ候補
+      hand: [JOKER_CARD, { suit: "spades", rank: 8 }, { suit: "spades", rank: 9 }],
+    });
+    const action = decideCpuAction(player, makeBoard(), [player]);
+    expect(action.type).toBe("place");
+  });
+
+  it("place-joker-with-card は人間が jokerPos カードを持つ選択肢を優先する", () => {
+    const cpuPlayer = makePlayer({
+      id: "cpu1",
+      hand: [JOKER_CARD, { suit: "spades", rank: 9 }, { suit: "hearts", rank: 9 }],
+    });
+    const humanPlayer = makePlayer({
+      id: "human",
+      type: "human",
+      // ♥8 を持っているため ♥8 が jokerPos になるコンボが選ばれるべき
+      hand: [{ suit: "hearts", rank: 8 }],
+    });
+    const board = makeBoard();
+    const action = decideCpuAction(cpuPlayer, board, [humanPlayer, cpuPlayer]);
+    expect(action.type).toBe("place-joker-with-card");
+    if (action.type === "place-joker-with-card") {
+      expect(action.jokerPos).toEqual({ suit: "hearts", rank: 8 });
+    }
+  });
 });

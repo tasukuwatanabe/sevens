@@ -1,6 +1,12 @@
 import { describe, it, expect } from "vite-plus/test";
-import { isValidPlay, getValidCards, canPass, getValidJokerPositions } from "@/game/rules";
-import type { Board, Player } from "@/types/game";
+import {
+  isValidPlay,
+  getValidCards,
+  canPass,
+  getValidJokerPositions,
+  getJokerWithCardOptions,
+} from "@/game/rules";
+import type { Board, Card, Player } from "@/types/game";
 import { JOKER_CARD } from "@/game/deck";
 
 function makeBoard(overrides: Partial<Record<string, { low: number; high: number }>> = {}): Board {
@@ -177,5 +183,66 @@ describe("getValidJokerPositions", () => {
       clubs: { low: 1, high: 13 },
     });
     expect(getValidJokerPositions(board)).toHaveLength(0);
+  });
+});
+
+describe("getJokerWithCardOptions", () => {
+  it("ジョーカーがない場合は空配列を返す", () => {
+    const hand: Card[] = [{ suit: "spades", rank: 5 }];
+    expect(getJokerWithCardOptions(hand, makeBoard())).toHaveLength(0);
+  });
+
+  it("ジョーカーがあってもコンボ候補がない場合は空配列を返す", () => {
+    // rank: 3 は初期ボード（low=7）の low-2=5 でも high+2=9 でもないためコンボ不可
+    const hand: Card[] = [JOKER_CARD, { suit: "spades", rank: 3 }];
+    expect(getJokerWithCardOptions(hand, makeBoard())).toHaveLength(0);
+  });
+
+  it("high+2 のカードがある場合はコンボ候補を返す", () => {
+    // high=7 → jokerPos=8, companionRank=9
+    const hand: Card[] = [JOKER_CARD, { suit: "spades", rank: 9 }];
+    const options = getJokerWithCardOptions(hand, makeBoard());
+    expect(options).toHaveLength(1);
+    expect(options[0]!.jokerPos).toEqual({ suit: "spades", rank: 8 });
+    expect(options[0]!.companionCard).toEqual({ suit: "spades", rank: 9 });
+  });
+
+  it("low-2 のカードがある場合はコンボ候補を返す", () => {
+    // low=7 → jokerPos=6, companionRank=5
+    const hand: Card[] = [JOKER_CARD, { suit: "hearts", rank: 5 }];
+    const options = getJokerWithCardOptions(hand, makeBoard());
+    expect(options).toHaveLength(1);
+    expect(options[0]!.jokerPos).toEqual({ suit: "hearts", rank: 6 });
+    expect(options[0]!.companionCard).toEqual({ suit: "hearts", rank: 5 });
+  });
+
+  it("high=11 のとき rank13 はコンボ候補として有効（companion = high+2 = 13）", () => {
+    const board = makeBoard({ spades: { low: 7, high: 11 } });
+    const hand: Card[] = [JOKER_CARD, { suit: "spades", rank: 13 }];
+    const options = getJokerWithCardOptions(hand, board);
+    expect(options).toHaveLength(1);
+    expect(options[0]!.jokerPos).toEqual({ suit: "spades", rank: 12 });
+    expect(options[0]!.companionCard).toEqual({ suit: "spades", rank: 13 });
+  });
+
+  it("high=12 のときはhigh側コンボなし（companion = 14 は無効）", () => {
+    const board = makeBoard({ spades: { low: 7, high: 12 } });
+    const hand: Card[] = [JOKER_CARD, { suit: "spades", rank: 13 }];
+    expect(getJokerWithCardOptions(hand, board)).toHaveLength(0);
+  });
+
+  it("low=3 のとき rank1 はコンボ候補として有効（companion = low-2 = 1）", () => {
+    const board = makeBoard({ clubs: { low: 3, high: 7 } });
+    const hand: Card[] = [JOKER_CARD, { suit: "clubs", rank: 1 }];
+    const options = getJokerWithCardOptions(hand, board);
+    expect(options).toHaveLength(1);
+    expect(options[0]!.jokerPos).toEqual({ suit: "clubs", rank: 2 });
+    expect(options[0]!.companionCard).toEqual({ suit: "clubs", rank: 1 });
+  });
+
+  it("low=2 のときはlow側コンボなし（companion = 0 は無効）", () => {
+    const board = makeBoard({ clubs: { low: 2, high: 7 } });
+    const hand: Card[] = [JOKER_CARD, { suit: "clubs", rank: 1 }];
+    expect(getJokerWithCardOptions(hand, board)).toHaveLength(0);
   });
 });

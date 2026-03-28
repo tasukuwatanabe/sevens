@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vite-plus/test";
-import { initGame, placeCard, placeJoker, passTurn } from "@/game/state";
+import { initGame, placeCard, placeJoker, placeJokerWithCard, passTurn } from "@/game/state";
 import { getValidCards } from "@/game/rules";
 import { isJokerCard } from "@/utils/card";
 import type { NormalCard } from "@/types/game";
@@ -191,6 +191,103 @@ describe("placeJoker", () => {
     const next = placeJoker(state, { suit: "spades", rank: 6 });
     expect(next.phase).toBe("playing");
     expect(next.winner).toBeNull();
+  });
+});
+
+describe("placeJokerWithCard", () => {
+  it("ジョーカーとコンパニオンカードが holder の手札から消える", () => {
+    const state = initGame();
+    const jokerPos: NormalCard = { suit: "spades", rank: 8 };
+    const companionCard: NormalCard = { suit: "spades", rank: 9 };
+    state.players[0]!.hand = [JOKER_CARD, companionCard, { suit: "clubs", rank: 1 }];
+
+    const next = placeJokerWithCard(state, jokerPos, companionCard);
+    const hand = next.players[0]!.hand;
+    expect(hand.some(isJokerCard)).toBe(false);
+    expect(hand.some((c) => !isJokerCard(c) && (c as NormalCard).rank === 9)).toBe(false);
+    expect(hand).toHaveLength(1);
+  });
+
+  it("ボードが2段階更新される（jokerPos と companionCard）", () => {
+    const state = initGame();
+    state.players[0]!.hand = [JOKER_CARD, { suit: "spades", rank: 9 }];
+
+    const next = placeJokerWithCard(
+      state,
+      { suit: "spades", rank: 8 },
+      { suit: "spades", rank: 9 },
+    );
+    expect(next.board.spades.high).toBe(9);
+  });
+
+  it("jokerPos の本来のカードを持つプレイヤーがジョーカーを受け取る", () => {
+    const state = initGame();
+    const jokerPos: NormalCard = { suit: "hearts", rank: 8 };
+    const companionCard: NormalCard = { suit: "hearts", rank: 9 };
+    state.players[0]!.hand = [JOKER_CARD, companionCard];
+    state.players[1]!.hand = [jokerPos];
+
+    const next = placeJokerWithCard(state, jokerPos, companionCard);
+    expect(next.players[1]!.hand.some(isJokerCard)).toBe(true);
+    expect(
+      next.players[1]!.hand.some(
+        (c) =>
+          !isJokerCard(c) && (c as NormalCard).suit === "hearts" && (c as NormalCard).rank === 8,
+      ),
+    ).toBe(false);
+  });
+
+  it("holder の手札が空になったら勝利", () => {
+    const state = initGame();
+    const jokerPos: NormalCard = { suit: "spades", rank: 8 };
+    const companionCard: NormalCard = { suit: "spades", rank: 9 };
+    state.players[0]!.hand = [JOKER_CARD, companionCard];
+    state.players[1]!.hand = [jokerPos];
+
+    const next = placeJokerWithCard(state, jokerPos, companionCard);
+    expect(next.phase).toBe("gameover");
+    expect(next.winner).toBe("human");
+  });
+
+  it("手札が残る場合はgameoverにならない", () => {
+    const state = initGame();
+    state.players[0]!.hand = [JOKER_CARD, { suit: "spades", rank: 9 }, { suit: "clubs", rank: 1 }];
+
+    const next = placeJokerWithCard(
+      state,
+      { suit: "spades", rank: 8 },
+      { suit: "spades", rank: 9 },
+    );
+    expect(next.phase).toBe("playing");
+    expect(next.winner).toBeNull();
+  });
+
+  it("ターンが次のプレイヤーに移る", () => {
+    const state = initGame();
+    state.players[0]!.hand = [JOKER_CARD, { suit: "spades", rank: 9 }, { suit: "clubs", rank: 1 }];
+
+    const next = placeJokerWithCard(
+      state,
+      { suit: "spades", rank: 8 },
+      { suit: "spades", rank: 9 },
+    );
+    expect(next.currentPlayerIndex).toBe(1);
+  });
+
+  it("ターゲットのカードを誰も持っていない場合もボードは更新される", () => {
+    const state = initGame();
+    state.players[0]!.hand = [JOKER_CARD, { suit: "spades", rank: 9 }];
+    state.players[1]!.hand = [];
+    state.players[2]!.hand = [];
+    state.players[3]!.hand = [];
+
+    const next = placeJokerWithCard(
+      state,
+      { suit: "spades", rank: 8 },
+      { suit: "spades", rank: 9 },
+    );
+    expect(next.board.spades.high).toBe(9);
+    expect(next.players[0]!.hand.some(isJokerCard)).toBe(false);
   });
 });
 
