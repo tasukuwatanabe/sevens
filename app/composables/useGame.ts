@@ -120,7 +120,7 @@ export function useGame() {
     (newHand, oldHand) => {
       const hadJoker = oldHand?.some(isJokerCard) ?? false;
       const hasJoker = newHand.some(isJokerCard);
-      if (!hadJoker && hasJoker) {
+      if (!hadJoker && hasJoker && state.value.phase !== "gameover") {
         showJokerNotification.value = true;
       }
     },
