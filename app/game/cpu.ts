@@ -57,34 +57,31 @@ function selectBestCard(validCards: NormalCard[], hand: Card[], board: Board): N
 
 // 妨害戦略として人間プレイヤーが持つカードの位置を優先する
 // ジョーカーを渡すことで人間の手を一枚増やし、次の手を塞ぐ
-function pickCpuJokerPosition(positions: NormalCard[], allPlayers: Player[]): NormalCard {
-  const humanPlayer = allPlayers.find((p) => p.type === "human")!;
-  const humanTargets = positions.filter((pos) =>
-    humanPlayer.hand.some((c) => !isJokerCard(c) && areCardsEqual(c, pos)),
-  );
-  return humanTargets.length > 0 ? humanTargets[0]! : positions[0]!;
+function pickHumanTarget<T>(items: T[], getCard: (item: T) => NormalCard, allPlayers: Player[]): T {
+  const humanPlayer = allPlayers.find((p) => p.type === "human");
+  if (humanPlayer) {
+    const target = items.find((item) =>
+      humanPlayer.hand.some((c) => !isJokerCard(c) && areCardsEqual(c, getCard(item))),
+    );
+    if (target) return target;
+  }
+  return items[0]!;
 }
 
-// コンボ出し時も同様に、jokerPos のカードを人間が持つ選択肢を優先する
+function pickCpuJokerPosition(positions: NormalCard[], allPlayers: Player[]): NormalCard {
+  return pickHumanTarget(positions, (pos) => pos, allPlayers);
+}
+
 function pickBestJokerWithCardOption(
   options: JokerWithCardOption[],
   allPlayers: Player[],
 ): JokerWithCardOption {
-  const humanPlayer = allPlayers.find((p) => p.type === "human");
-  if (humanPlayer) {
-    const humanTargets = options.filter((opt) =>
-      humanPlayer.hand.some((c) => !isJokerCard(c) && areCardsEqual(c, opt.jokerPos)),
-    );
-    if (humanTargets.length > 0) return humanTargets[0]!;
-  }
-  return options[0]!;
+  return pickHumanTarget(options, (opt) => opt.jokerPos, allPlayers);
 }
 
 export function decideCpuAction(player: Player, board: Board, allPlayers: Player[]): CpuAction {
   const hasJoker = player.hand.some(isJokerCard);
   const validCards = getValidCards(player.hand, board) as NormalCard[];
-  const validJokerPositions = hasJoker ? getValidJokerPositions(board) : [];
-  const jokerWithCardOptions = hasJoker ? getJokerWithCardOptions(player.hand, board) : [];
 
   // 通常カードが出せる場合はジョーカーを温存する（詰まった時の切り札として使う）
   if (validCards.length > 0) {
@@ -93,6 +90,7 @@ export function decideCpuAction(player: Player, board: Board, allPlayers: Player
 
   if (hasJoker) {
     // コンボ出しはジョーカー単体より2枚分手札を減らせるため優先する
+    const jokerWithCardOptions = getJokerWithCardOptions(player.hand, board);
     if (jokerWithCardOptions.length > 0) {
       const best = pickBestJokerWithCardOption(jokerWithCardOptions, allPlayers);
       return {
@@ -101,6 +99,7 @@ export function decideCpuAction(player: Player, board: Board, allPlayers: Player
         companionCard: best.companionCard,
       };
     }
+    const validJokerPositions = getValidJokerPositions(board);
     if (validJokerPositions.length > 0) {
       return {
         type: "place-joker",

@@ -45,14 +45,9 @@ export function useGame() {
   );
   // 選択中のジョーカー位置に対応するコンボ候補
   const selectedJokerComboOption = computed<JokerWithCardOption | null>(() => {
-    if (!selectedJokerPos.value) return null;
-    return (
-      jokerComboOptions.value.find(
-        (opt) =>
-          opt.jokerPos.suit === selectedJokerPos.value!.suit &&
-          opt.jokerPos.rank === selectedJokerPos.value!.rank,
-      ) ?? null
-    );
+    const pos = selectedJokerPos.value;
+    if (!pos) return null;
+    return jokerComboOptions.value.find((opt) => areCardsEqual(opt.jokerPos, pos)) ?? null;
   });
   // コンボ選択モード中にボード上でハイライトする位置（jokerPos + companionCard）
   const comboHighlightPositions = computed<NormalCard[]>(() => {
@@ -111,9 +106,7 @@ export function useGame() {
 
   function placeJokerAtPosition(pos: NormalCard) {
     if (!isHumanTurn.value || !jokerMode.value) return;
-    const comboOption = jokerComboOptions.value.find(
-      (opt) => opt.jokerPos.suit === pos.suit && opt.jokerPos.rank === pos.rank,
-    );
+    const comboOption = jokerComboOptions.value.find((opt) => areCardsEqual(opt.jokerPos, pos));
     if (comboOption) {
       // コンボ可能な位置を選んだ場合は第2段階へ進む
       selectedJokerPos.value = pos;

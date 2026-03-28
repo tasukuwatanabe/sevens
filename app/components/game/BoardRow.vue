@@ -20,18 +20,12 @@ function isPlaced(rank: number) {
   return rank >= props.boardSuit.low && rank <= props.boardSuit.high;
 }
 
-function isJokerTarget(rank: Rank) {
-  return (
-    props.jokerTargets?.some((t) => t.suit === props.boardSuit.suit && t.rank === rank) ?? false
-  );
+function isInSet(rank: Rank, targets: NormalCard[] | undefined): boolean {
+  return targets?.some((t) => t.suit === props.boardSuit.suit && t.rank === rank) ?? false;
 }
 
-function isComboHighlight(rank: Rank) {
-  return (
-    props.comboHighlightTargets?.some((t) => t.suit === props.boardSuit.suit && t.rank === rank) ??
-    false
-  );
-}
+const isJokerTarget = (rank: Rank) => isInSet(rank, props.jokerTargets);
+const isComboHighlight = (rank: Rank) => isInSet(rank, props.comboHighlightTargets);
 </script>
 
 <template>
