@@ -31,7 +31,7 @@ const isRed = computed(() => isRedSuit(props.suit));
             ? isRed
               ? 'bg-white border-2 border-red-400 text-red-600'
               : 'bg-white border-2 border-gray-700 text-gray-900'
-            : 'bg-gray-100 border-2 border-dashed border-gray-300 text-gray-500',
+            : 'bg-gray-100 border-2 border-dashed border-gray-300 text-gray-600',
     ]"
     :role="isJokerTarget && !isComboHighlight ? 'button' : 'img'"
     :aria-label="
