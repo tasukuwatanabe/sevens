@@ -33,6 +33,8 @@ function updatePlayer(players: Player[], index: number, updates: Partial<Player>
 
 export function initGame(): GameState {
   const deck = shuffleDeck(createDeck());
+  // 7はボードの起点として最初から置かれているため、手札に含めると
+  // 通常の有効判定（low-1 / high+1）をすり抜けてしまう
   const sevenIndices = deck
     .map((card, i) => (!isJokerCard(card) && (card as NormalCard).rank === 7 ? i : -1))
     .filter((i) => i !== -1);

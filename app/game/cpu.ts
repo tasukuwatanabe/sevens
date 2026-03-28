@@ -24,10 +24,16 @@ export function hasNoAdjacentCard(card: NormalCard, hand: Card[]): boolean {
   );
 }
 
+// 両端（A/K）に近いカードほど将来置ける位置が少なくなるため優先度を下げる
+// rank 7付近は0、rank 1/13は最大3を返す
 export function calcDistanceScore(card: NormalCard): number {
   return Math.max(0, 3 - Math.min(card.rank - 1, 13 - card.rank));
 }
 
+// 手番で出すカードのスコアを算出する（高いほど優先）
+// - 新たに有効なカードを増やす効果を最重視（×10）
+// - 隣接カードがない孤立したカードを早めに場に出す（+5）
+// - 両端に近いカードを優先して場を広げる（0〜3）
 function scoreCard(card: NormalCard, hand: Card[], board: Board): number {
   return (
     countNewlyValidCards(card, hand, board) * 10 +
@@ -42,6 +48,8 @@ function selectBestCard(validCards: NormalCard[], hand: Card[], board: Board): N
   );
 }
 
+// 妨害戦略として人間プレイヤーが持つカードの位置を優先する
+// ジョーカーを渡すことで人間の手を一枚増やし、次の手を塞ぐ
 function pickCpuJokerPosition(positions: NormalCard[], allPlayers: Player[]): NormalCard {
   const humanPlayer = allPlayers.find((p) => p.type === "human")!;
   const humanTargets = positions.filter((pos) =>
@@ -55,6 +63,7 @@ export function decideCpuAction(player: Player, board: Board, allPlayers: Player
   const validCards = getValidCards(player.hand, board) as NormalCard[];
   const validJokerPositions = hasJoker ? getValidJokerPositions(board) : [];
 
+  // 通常カードが出せる場合はジョーカーを温存する（詰まった時の切り札として使う）
   if (hasJoker && validCards.length === 0 && validJokerPositions.length > 0) {
     return { type: "place-joker", position: pickCpuJokerPosition(validJokerPositions, allPlayers) };
   }

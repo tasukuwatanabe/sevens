@@ -120,6 +120,7 @@ export function useGame() {
     (newHand, oldHand) => {
       const hadJoker = oldHand?.some(isJokerCard) ?? false;
       const hasJoker = newHand.some(isJokerCard);
+      // ゲーム終了と同時にジョーカーが転送された場合は演出を出しても意味がない
       if (!hadJoker && hasJoker && state.value.phase !== "gameover") {
         showJokerNotification.value = true;
       }
