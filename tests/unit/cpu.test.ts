@@ -133,9 +133,10 @@ describe("decideCpuAction", () => {
     }
   });
 
-  it("ジョーカーを持ち有効なカードがない場合はplace-jokerを返す", () => {
+  it("ジョーカーを持ちコンボも通常カードも出せない場合はplace-jokerを返す", () => {
     const player = makePlayer({
-      hand: [JOKER_CARD, { suit: "spades", rank: 5 }],
+      // rank: 3 は有効牌でもコンボ候補（rank5/9）でもないためコンボは発生しない
+      hand: [JOKER_CARD, { suit: "spades", rank: 3 }],
     });
     const humanPlayer = makePlayer({
       id: "human",
@@ -157,7 +158,8 @@ describe("decideCpuAction", () => {
   it("place-jokerの場合は人間が持つカードの位置を優先する", () => {
     const cpuPlayer = makePlayer({
       id: "cpu1",
-      hand: [JOKER_CARD, { suit: "spades", rank: 5 }],
+      // rank: 3 は有効牌でもコンボ候補でもないため place-joker に落ちる
+      hand: [JOKER_CARD, { suit: "spades", rank: 3 }],
     });
     const humanPlayer = makePlayer({
       id: "human",
@@ -166,6 +168,7 @@ describe("decideCpuAction", () => {
     });
     const board = makeBoard();
     const action = decideCpuAction(cpuPlayer, board, [humanPlayer, cpuPlayer]);
+    expect(action.type).toBe("place-joker");
     if (action.type === "place-joker") {
       expect(action.position).toEqual({ suit: "hearts", rank: 8 });
     }
@@ -188,12 +191,13 @@ describe("decideCpuAction", () => {
   it("place-jokerで人間が対象カードを持たない場合は最初のpositionを選ぶ", () => {
     const cpuPlayer = makePlayer({
       id: "cpu1",
-      hand: [JOKER_CARD, { suit: "spades", rank: 5 }],
+      // rank: 3 は有効牌でもコンボ候補でもないため place-joker に落ちる
+      hand: [JOKER_CARD, { suit: "spades", rank: 3 }],
     });
     const humanPlayer = makePlayer({
       id: "human",
       type: "human",
-      hand: [{ suit: "clubs", rank: 5 }],
+      hand: [{ suit: "clubs", rank: 3 }],
     });
     const board = makeBoard();
     const action = decideCpuAction(cpuPlayer, board, [humanPlayer, cpuPlayer]);

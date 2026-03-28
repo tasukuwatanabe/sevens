@@ -33,7 +33,8 @@ export type GameStatusCode =
   | "human-joker-or-pass"
   | "human-turn"
   | "cpu-turn"
-  | "human-joker-mode";
+  | "human-joker-mode"
+  | "human-joker-combo-select";
 
 export interface GameState {
   phase: GamePhase;

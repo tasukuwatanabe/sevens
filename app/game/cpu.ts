@@ -1,12 +1,19 @@
 import type { Card, NormalCard, Player, Board } from "@/types/game";
-import { getValidCards, isValidPlay, getValidJokerPositions } from "./rules";
+import {
+  getValidCards,
+  isValidPlay,
+  getValidJokerPositions,
+  getJokerWithCardOptions,
+} from "./rules";
+import type { JokerWithCardOption } from "./rules";
 import { areCardsEqual, isJokerCard } from "@/utils/card";
 import { updateBoard } from "./state";
 
 export type CpuAction =
   | { type: "place"; card: NormalCard }
   | { type: "pass" }
-  | { type: "place-joker"; position: NormalCard };
+  | { type: "place-joker"; position: NormalCard }
+  | { type: "place-joker-with-card"; jokerPos: NormalCard; companionCard: NormalCard };
 
 export function countNewlyValidCards(card: NormalCard, hand: Card[], board: Board): number {
   const newBoard = updateBoard(board, card);
@@ -58,22 +65,49 @@ function pickCpuJokerPosition(positions: NormalCard[], allPlayers: Player[]): No
   return humanTargets.length > 0 ? humanTargets[0]! : positions[0]!;
 }
 
+// コンボ出し時も同様に、jokerPos のカードを人間が持つ選択肢を優先する
+function pickBestJokerWithCardOption(
+  options: JokerWithCardOption[],
+  allPlayers: Player[],
+): JokerWithCardOption {
+  const humanPlayer = allPlayers.find((p) => p.type === "human");
+  if (humanPlayer) {
+    const humanTargets = options.filter((opt) =>
+      humanPlayer.hand.some((c) => !isJokerCard(c) && areCardsEqual(c, opt.jokerPos)),
+    );
+    if (humanTargets.length > 0) return humanTargets[0]!;
+  }
+  return options[0]!;
+}
+
 export function decideCpuAction(player: Player, board: Board, allPlayers: Player[]): CpuAction {
   const hasJoker = player.hand.some(isJokerCard);
   const validCards = getValidCards(player.hand, board) as NormalCard[];
   const validJokerPositions = hasJoker ? getValidJokerPositions(board) : [];
+  const jokerWithCardOptions = hasJoker ? getJokerWithCardOptions(player.hand, board) : [];
 
   // 通常カードが出せる場合はジョーカーを温存する（詰まった時の切り札として使う）
-  if (hasJoker && validCards.length === 0 && validJokerPositions.length > 0) {
-    return { type: "place-joker", position: pickCpuJokerPosition(validJokerPositions, allPlayers) };
+  if (validCards.length > 0) {
+    return { type: "place", card: selectBestCard(validCards, player.hand, board) };
   }
 
-  if (validCards.length === 0) {
-    return { type: "pass" };
+  if (hasJoker) {
+    // コンボ出しはジョーカー単体より2枚分手札を減らせるため優先する
+    if (jokerWithCardOptions.length > 0) {
+      const best = pickBestJokerWithCardOption(jokerWithCardOptions, allPlayers);
+      return {
+        type: "place-joker-with-card",
+        jokerPos: best.jokerPos,
+        companionCard: best.companionCard,
+      };
+    }
+    if (validJokerPositions.length > 0) {
+      return {
+        type: "place-joker",
+        position: pickCpuJokerPosition(validJokerPositions, allPlayers),
+      };
+    }
   }
 
-  return {
-    type: "place",
-    card: selectBestCard(validCards, player.hand, board),
-  };
+  return { type: "pass" };
 }

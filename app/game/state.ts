@@ -136,6 +136,47 @@ export function placeJoker(state: GameState, targetPos: NormalCard): GameState {
   };
 }
 
+export function placeJokerWithCard(
+  state: GameState,
+  jokerPos: NormalCard,
+  companionCard: NormalCard,
+): GameState {
+  const holderIndex = state.currentPlayerIndex;
+  const holder = state.players[holderIndex]!;
+
+  const handAfterJoker = holder.hand.filter((c) => !isJokerCard(c));
+  const holderNewHand = removeFromHand(handAfterJoker, companionCard);
+
+  const recipientIndex = state.players.findIndex((p) =>
+    p.hand.some((c) => !isJokerCard(c) && areCardsEqual(c, jokerPos)),
+  );
+
+  let newBoard = updateBoard(state.board, jokerPos);
+  newBoard = updateBoard(newBoard, companionCard);
+
+  let newPlayers = updatePlayer(state.players, holderIndex, { hand: holderNewHand });
+
+  if (recipientIndex !== -1 && recipientIndex !== holderIndex) {
+    const recipient = state.players[recipientIndex]!;
+    const recipientNewHand = [
+      ...recipient.hand.filter((c) => !areCardsEqual(c, jokerPos)),
+      JOKER_CARD,
+    ];
+    newPlayers = updatePlayer(newPlayers, recipientIndex, { hand: recipientNewHand });
+  }
+
+  const winner: PlayerId | null = holderNewHand.length === 0 ? holder.id : null;
+
+  return {
+    ...state,
+    board: newBoard,
+    players: newPlayers,
+    currentPlayerIndex: (holderIndex + 1) % PLAYER_COUNT,
+    winner,
+    phase: winner ? "gameover" : "playing",
+  };
+}
+
 export function passTurn(state: GameState): GameState {
   const playerIndex = state.currentPlayerIndex;
   const player = state.players[playerIndex]!;

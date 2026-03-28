@@ -15,6 +15,7 @@ const STATUS_MESSAGES: Record<GameStatusCode, (name: string) => string> = {
   "human-turn": () => "あなたのターン",
   "cpu-turn": (name) => `${name}のターン`,
   "human-joker-mode": () => "ジョーカーを置く場所を選んでください",
+  "human-joker-combo-select": () => "ジョーカーと一緒にカードを出しますか？",
 };
 
 const isHumanTurn = computed(
@@ -23,7 +24,8 @@ const isHumanTurn = computed(
     props.status === "human-must-pass" ||
     props.status === "human-joker-or-pass" ||
     props.status === "human-turn" ||
-    props.status === "human-joker-mode",
+    props.status === "human-joker-mode" ||
+    props.status === "human-joker-combo-select",
 );
 
 const message = computed(() => STATUS_MESSAGES[props.status](props.playerName));

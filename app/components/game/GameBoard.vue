@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SUITS, MAX_PASSES } from "@/game/constants";
 import { useGame } from "@/composables/useGame";
+import { rankLabel, suitSymbol } from "@/utils/card";
 import type { Suit, Rank, NormalCard } from "@/types/game";
 
 const {
@@ -15,7 +16,10 @@ const {
   gameStatus,
   currentPlayer,
   jokerMode,
+  selectedJokerPos,
   validJokerPositions,
+  selectedJokerComboOption,
+  comboHighlightPositions,
   showJokerNotification,
   playCard,
   pass,
@@ -23,10 +27,19 @@ const {
   enterJokerMode,
   cancelJokerMode,
   placeJokerAtPosition,
+  confirmJokerCombo,
+  confirmJokerAlone,
   dismissJokerNotification,
 } = useGame();
 
 const showResetConfirm = ref(false);
+
+// コンボ確認 UI に表示するカード名（例: "♠J"）
+const companionLabel = computed(() => {
+  const c = selectedJokerComboOption.value?.companionCard;
+  if (!c) return "";
+  return `${suitSymbol(c.suit)}${rankLabel(c.rank)}`;
+});
 
 function handleResetRequest() {
   if (state.value.phase === "playing") {
@@ -73,6 +86,7 @@ function handleJokerPlace(suit: Suit, rank: Rank) {
         :key="suit"
         :board-suit="state.board[suit]"
         :joker-targets="validJokerPositions"
+        :combo-highlight-targets="comboHighlightPositions"
         @joker-place="handleJokerPlace"
       />
     </div>
@@ -95,12 +109,26 @@ function handleJokerPlace(suit: Suit, rank: Rank) {
     </div>
 
     <div class="flex gap-2 justify-center flex-wrap">
+      <template v-if="selectedJokerComboOption">
+        <button
+          class="px-4 py-2 rounded-lg bg-yellow-500 text-white font-medium hover:bg-yellow-600 transition-colors"
+          @click="confirmJokerCombo"
+        >
+          コンボで出す（ジョーカー + {{ companionLabel }}）
+        </button>
+        <button
+          class="px-4 py-2 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors"
+          @click="confirmJokerAlone"
+        >
+          ジョーカーのみ
+        </button>
+      </template>
       <button
         v-if="jokerMode"
         class="px-4 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-gray-600 transition-colors"
         @click="cancelJokerMode"
       >
-        キャンセル
+        {{ selectedJokerPos ? "位置を選び直す" : "キャンセル" }}
       </button>
       <ActionButtons
         :can-pass="canPassTurn"

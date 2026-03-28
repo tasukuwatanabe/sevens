@@ -7,6 +7,7 @@ import { suitSymbol, suitLabel, isRedSuit } from "@/utils/card";
 const props = defineProps<{
   boardSuit: BoardSuit;
   jokerTargets?: NormalCard[];
+  comboHighlightTargets?: NormalCard[];
 }>();
 
 const emit = defineEmits<{
@@ -22,6 +23,13 @@ function isPlaced(rank: number) {
 function isJokerTarget(rank: Rank) {
   return (
     props.jokerTargets?.some((t) => t.suit === props.boardSuit.suit && t.rank === rank) ?? false
+  );
+}
+
+function isComboHighlight(rank: Rank) {
+  return (
+    props.comboHighlightTargets?.some((t) => t.suit === props.boardSuit.suit && t.rank === rank) ??
+    false
   );
 }
 </script>
@@ -44,6 +52,7 @@ function isJokerTarget(rank: Rank) {
         :placed="isPlaced(rank)"
         :is-seven="rank === 7"
         :is-joker-target="isJokerTarget(rank)"
+        :is-combo-highlight="isComboHighlight(rank)"
         @joker-place="(s, r) => emit('joker-place', s, r)"
       />
     </div>
