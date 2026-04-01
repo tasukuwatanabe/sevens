@@ -1,4 +1,4 @@
-import type { GameState, Player, PlayerId } from "@/types/game";
+import type { GameState, Player, PlayerId } from "../../app/types/game";
 import type {
   SeatIndex,
   SeatInfo,
@@ -6,11 +6,17 @@ import type {
   ClientMessage,
   ClientRoomView,
   ClientGameView,
-} from "@/types/online";
-import { initGame, placeCard, placeJoker, placeJokerWithCard, passTurn } from "@/game/state";
-import { decideCpuAction } from "@/game/cpu";
-import { isValidPlay, getValidJokerPositions, canPass } from "@/game/rules";
-import { isJokerCard } from "@/utils/card";
+} from "../../app/types/online";
+import {
+  initGame,
+  placeCard,
+  placeJoker,
+  placeJokerWithCard,
+  passTurn,
+} from "../../app/game/state";
+import { decideCpuAction } from "../../app/game/cpu";
+import { isValidPlay, getValidJokerPositions, canPass } from "../../app/game/rules";
+import { isJokerCard } from "../../app/utils/card";
 
 const TURN_TIMEOUT_MS = 60_000;
 const CPU_DELAY_MS = 800;
