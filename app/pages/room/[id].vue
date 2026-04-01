@@ -81,6 +81,8 @@ const isMyWin = computed(
   () => winnerSeatIndex.value !== null && winnerSeatIndex.value === room.value?.mySeatIndex,
 );
 
+const showLeaveConfirm = ref(false);
+
 function backToHome() {
   navigateTo("/");
 }
@@ -113,6 +115,7 @@ function backToHome() {
     >
       参加する
     </button>
+    <NuxtLink to="/" class="text-green-300 underline text-sm mt-4">トップに戻る</NuxtLink>
   </div>
 
   <!-- Connecting -->
@@ -123,6 +126,7 @@ function backToHome() {
     <p v-if="!connected" class="animate-pulse">接続中…</p>
     <p v-else class="animate-pulse">ルーム情報を取得中…</p>
     <p v-if="error" class="text-red-400 mt-2">{{ error }}</p>
+    <NuxtLink to="/" class="text-green-300 underline text-sm mt-4">トップに戻る</NuxtLink>
   </div>
 
   <!-- Waiting room (lobby) -->
@@ -139,7 +143,15 @@ function backToHome() {
 
   <!-- Playing / Game Over -->
   <div v-else class="min-h-screen bg-green-900 text-white p-2 sm:p-4 flex flex-col gap-2 sm:gap-4">
-    <h1 class="text-center text-xl sm:text-2xl font-bold">7並べ オンライン</h1>
+    <div class="flex items-center justify-center relative">
+      <h1 class="text-xl sm:text-2xl font-bold">7並べ オンライン</h1>
+      <button
+        class="absolute right-0 text-green-300 underline text-sm cursor-pointer"
+        @click="showLeaveConfirm = true"
+      >
+        退出
+      </button>
+    </div>
 
     <div class="flex justify-center gap-3 flex-wrap">
       <PlayerSeat
@@ -267,6 +279,33 @@ function backToHome() {
     </div>
 
     <JokerReceivedOverlay v-if="showJokerNotification" @close="dismissJokerNotification" />
+
+    <!-- Leave confirm modal -->
+    <div
+      v-if="showLeaveConfirm"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="bg-white rounded-2xl shadow-xl p-8 text-center max-w-sm w-full mx-4">
+        <h2 class="text-xl font-bold mb-3 text-gray-800">ルームを退出</h2>
+        <p class="text-gray-600 mb-6">退出すると、ゲームに戻ることはできません。退出しますか？</p>
+        <div class="flex gap-3 justify-center">
+          <button
+            class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-colors cursor-pointer"
+            @click="showLeaveConfirm = false"
+          >
+            キャンセル
+          </button>
+          <button
+            class="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold transition-colors cursor-pointer"
+            @click="backToHome"
+          >
+            退出する
+          </button>
+        </div>
+      </div>
+    </div>
 
     <p v-if="error" class="text-center text-red-400 text-sm">{{ error }}</p>
   </div>
