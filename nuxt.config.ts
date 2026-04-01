@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
+  ssr: false,
   modules: ["@nuxtjs/tailwindcss", "@vite-pwa/nuxt"],
   components: {
     dirs: [{ path: "~/components", pathPrefix: false }],
@@ -18,10 +19,21 @@ export default defineNuxtConfig({
       ],
     },
   },
+  runtimeConfig: {
+    public: {
+      workerUrl: "",
+    },
+  },
   nitro: {
+    preset: "static",
     compressPublicAssets: {
       gzip: true,
       brotli: true,
+    },
+    devProxy: {
+      "/api/": {
+        target: "http://localhost:8787/api/",
+      },
     },
   },
   pwa: {
