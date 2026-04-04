@@ -4,6 +4,7 @@ export { GameRoom } from "./GameRoom";
 
 interface Env {
   GAME_ROOM: DurableObjectNamespace;
+  ASSETS: Fetcher;
 }
 
 export default {
@@ -23,6 +24,6 @@ export default {
       return stub.fetch(request);
     }
 
-    return new Response("Not Found", { status: 404 });
+    return env.ASSETS.fetch(request);
   },
 };
