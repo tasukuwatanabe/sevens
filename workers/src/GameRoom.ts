@@ -15,7 +15,12 @@ import {
   passTurn,
 } from "../../app/game/state";
 import { decideCpuAction } from "../../app/game/cpu";
-import { isValidPlay, getValidJokerPositions, canPass } from "../../app/game/rules";
+import {
+  isValidPlay,
+  getValidJokerPositions,
+  getJokerWithCardOptions,
+  canPass,
+} from "../../app/game/rules";
 import { isJokerCard } from "../../app/utils/card";
 
 const TURN_TIMEOUT_MS = 60_000;
@@ -418,6 +423,18 @@ export class GameRoom implements DurableObject {
       case "place-joker-with-card": {
         if (!player.hand.some(isJokerCard)) {
           this.sendError(ws, "NO_JOKER", "ジョーカーを持っていません");
+          return;
+        }
+        const validCombos = getJokerWithCardOptions(player.hand, room.game.board);
+        const isValidCombo = validCombos.some(
+          (opt) =>
+            opt.jokerPos.suit === msg.jokerPos.suit &&
+            opt.jokerPos.rank === msg.jokerPos.rank &&
+            opt.companionCard.suit === msg.companionCard.suit &&
+            opt.companionCard.rank === msg.companionCard.rank,
+        );
+        if (!isValidCombo) {
+          this.sendError(ws, "INVALID_JOKER_COMBO", "この組み合わせは無効です");
           return;
         }
         room.game = placeJokerWithCard(room.game, msg.jokerPos, msg.companionCard);
