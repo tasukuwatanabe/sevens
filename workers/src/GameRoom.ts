@@ -17,6 +17,7 @@ import {
 import { decideCpuAction } from "../../app/game/cpu";
 import {
   isValidPlay,
+  getValidCards,
   getValidJokerPositions,
   getJokerWithCardOptions,
   canPass,
@@ -421,6 +422,10 @@ export class GameRoom implements DurableObject {
       case "pass": {
         if (!canPass(player)) {
           this.sendError(ws, "NO_PASSES", "パスの残り回数がありません");
+          return;
+        }
+        if (getValidCards(player.hand, room.game.board).length > 0) {
+          this.sendError(ws, "CANNOT_PASS", "出せるカードがあります");
           return;
         }
         room.game = passTurn(room.game);
