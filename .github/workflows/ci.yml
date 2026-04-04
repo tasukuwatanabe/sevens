@@ -55,6 +55,7 @@ jobs:
         with:
           name: dist
           path: .output/
+          include-hidden-files: true
 
   deploy:
     name: Deploy
