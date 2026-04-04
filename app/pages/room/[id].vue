@@ -15,7 +15,6 @@ const {
   isMyTurn,
   validCards,
   canPassTurn,
-  humanHasJoker,
   jokerMode,
   selectedJokerPos,
   validJokerPositions,

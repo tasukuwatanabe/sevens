@@ -239,11 +239,6 @@ export class GameRoom implements DurableObject {
     emptySeat.playerName = playerName;
     emptySeat.isConnected = true;
 
-    // First human to join sets the roomId from the DO name
-    if (!room.roomId || room.roomId === "UNKNOWN") {
-      // Extract from the URL path used to access this DO
-    }
-
     const meta: SessionMeta = { seatIndex: emptySeat.index, sessionToken };
     const session: Session = { ...meta, ws };
     this.sessions.set(ws, session);

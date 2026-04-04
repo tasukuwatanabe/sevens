@@ -273,7 +273,6 @@ export function useOnlineGame(roomId: string) {
     turnTimeRemaining,
     connect,
     disconnect,
-    send,
     playCard,
     pass,
     startGame,
