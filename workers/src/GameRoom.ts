@@ -103,7 +103,13 @@ export class GameRoom implements DurableObject {
   }
 
   async webSocketMessage(ws: WebSocket, rawMsg: string | ArrayBuffer): Promise<void> {
-    const msg = JSON.parse(rawMsg as string) as ClientMessage;
+    let msg: ClientMessage;
+    try {
+      msg = JSON.parse(rawMsg as string) as ClientMessage;
+    } catch {
+      this.sendError(ws, "INVALID_MESSAGE", "不正なメッセージです");
+      return;
+    }
     const room = await this.loadRoom();
 
     switch (msg.type) {
