@@ -21,7 +21,7 @@ import {
   getJokerWithCardOptions,
   canPass,
 } from "../../app/game/rules";
-import { isJokerCard } from "../../app/utils/card";
+import { isJokerCard, areCardsEqual } from "../../app/utils/card";
 
 const TURN_TIMEOUT_MS = 60_000;
 const CPU_DELAY_MS = 800;
@@ -407,6 +407,10 @@ export class GameRoom implements DurableObject {
 
     switch (msg.type) {
       case "play-card": {
+        if (!player.hand.some((c) => areCardsEqual(c, msg.card))) {
+          this.sendError(ws, "CARD_NOT_IN_HAND", "そのカードは手札にありません");
+          return;
+        }
         if (!isValidPlay(msg.card, room.game.board)) {
           this.sendError(ws, "INVALID_PLAY", "このカードは出せません");
           return;
