@@ -24,8 +24,6 @@ export interface BoardSuit {
 
 export type Board = Record<Suit, BoardSuit>;
 
-export type GamePhase = "playing" | "gameover";
-
 export type GameStatusCode =
   | "cpu-thinking"
   | "human-place"
@@ -36,10 +34,12 @@ export type GameStatusCode =
   | "human-joker-mode"
   | "human-joker-combo-select";
 
-export interface GameState {
-  phase: GamePhase;
+type GameStateBase = {
   board: Board;
   players: Player[];
   currentPlayerIndex: number;
-  winner: PlayerId | null;
-}
+};
+
+export type GameState =
+  | (GameStateBase & { phase: "playing"; winner: null })
+  | (GameStateBase & { phase: "gameover"; winner: PlayerId });

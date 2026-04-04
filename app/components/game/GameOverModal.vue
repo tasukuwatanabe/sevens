@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from "vue";
+import { computed } from "vue";
 import type { PlayerId } from "@/types/game";
+import { useModalKeyboard } from "@/composables/useModalKeyboard";
 
 const props = defineProps<{
   winner: PlayerId;
@@ -15,20 +16,7 @@ const emit = defineEmits<{
 const winnerName = computed(() => props.players.find((p) => p.id === props.winner)?.name ?? "");
 const isHumanWin = computed(() => props.winner === "human");
 
-const resetButtonRef = ref<HTMLButtonElement | null>(null);
-
-function handleKeyDown(e: KeyboardEvent) {
-  if (e.key === "Escape") emit("reset");
-}
-
-onMounted(() => {
-  resetButtonRef.value?.focus();
-  document.addEventListener("keydown", handleKeyDown);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("keydown", handleKeyDown);
-});
+const { buttonRef } = useModalKeyboard(() => emit("reset"));
 </script>
 
 <template>
@@ -48,7 +36,7 @@ onUnmounted(() => {
       <p class="text-gray-600 mb-6">{{ winnerName }}が上がりました！</p>
       <div class="flex gap-3 justify-center flex-wrap">
         <button
-          ref="resetButtonRef"
+          ref="buttonRef"
           class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-semibold transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-700 focus-visible:outline-none"
           @click="emit('reset')"
         >

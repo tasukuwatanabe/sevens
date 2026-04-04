@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { SUITS, MAX_PASSES } from "@/game/constants";
 import { useGame } from "@/composables/useGame";
-import { rankLabel, suitSymbol } from "@/utils/card";
 import type { Suit, Rank, NormalCard } from "@/types/game";
 
 const {
@@ -51,13 +50,6 @@ function confirmHome() {
 function cancelHome() {
   showHomeConfirm.value = false;
 }
-
-// コンボ確認 UI に表示するカード名（例: "♠J"）
-const companionLabel = computed(() => {
-  const c = selectedJokerComboOption.value?.companionCard;
-  if (!c) return "";
-  return `${suitSymbol(c.suit)}${rankLabel(c.rank)}`;
-});
 
 function handleResetRequest() {
   if (state.value.phase === "playing") {
@@ -135,27 +127,14 @@ function handleJokerPlace(suit: Suit, rank: Rank) {
     </div>
 
     <div class="flex gap-2 justify-center flex-wrap">
-      <template v-if="selectedJokerComboOption">
-        <button
-          class="px-4 py-2 rounded-lg bg-yellow-500 text-white font-medium hover:bg-yellow-600 transition-colors"
-          @click="confirmJokerCombo"
-        >
-          コンボで出す（ジョーカー + {{ companionLabel }}）
-        </button>
-        <button
-          class="px-4 py-2 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors"
-          @click="confirmJokerAlone"
-        >
-          ジョーカーのみ
-        </button>
-      </template>
-      <button
-        v-if="jokerMode"
-        class="px-4 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-gray-600 transition-colors"
-        @click="cancelJokerMode"
-      >
-        {{ selectedJokerPos ? "位置を選び直す" : "キャンセル" }}
-      </button>
+      <JokerComboPanel
+        :selected-joker-combo-option="selectedJokerComboOption"
+        :joker-mode="jokerMode"
+        :selected-joker-pos="selectedJokerPos"
+        @confirm-combo="confirmJokerCombo"
+        @confirm-alone="confirmJokerAlone"
+        @cancel="cancelJokerMode"
+      />
       <ActionButtons
         :can-pass="canPassTurn"
         :is-human-turn="isHumanTurn && !jokerMode"
@@ -165,7 +144,7 @@ function handleJokerPlace(suit: Suit, rank: Rank) {
     </div>
 
     <GameOverModal
-      v-if="state.phase === 'gameover' && state.winner"
+      v-if="state.phase === 'gameover'"
       :winner="state.winner"
       :players="state.players"
       @reset="resetGame"

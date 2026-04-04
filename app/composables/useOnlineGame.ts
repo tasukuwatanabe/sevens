@@ -1,8 +1,8 @@
 import type { Card, NormalCard, GameStatusCode } from "@/types/game";
 import type { ClientMessage, ClientRoomView, SeatIndex, ServerMessage } from "@/types/online";
-import { getValidCards, getValidJokerPositions, getJokerWithCardOptions } from "@/game/rules";
-import type { JokerWithCardOption } from "@/game/rules";
-import { isJokerCard, areCardsEqual } from "@/utils/card";
+import { getValidCards } from "@/game/rules";
+import { isJokerCard } from "@/utils/card";
+import { useJokerMode } from "./useJokerMode";
 import { MAX_PASSES } from "@/game/constants";
 
 const SESSION_KEY = "sevens-online-session";
@@ -17,9 +17,6 @@ export function useOnlineGame(roomId: string) {
   const room = ref<ClientRoomView | null>(null);
   const connected = ref(false);
   const error = ref<string | null>(null);
-  const jokerMode = ref(false);
-  const selectedJokerPos = ref<NormalCard | null>(null);
-  const showJokerNotification = ref(false);
 
   let ws: WebSocket | null = null;
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -39,34 +36,26 @@ export function useOnlineGame(roomId: string) {
     const passesUsed = room.value.game.passesUsed[room.value.mySeatIndex] ?? 0;
     return passesUsed < MAX_PASSES && validCards.value.length === 0;
   });
-  const humanHasJoker = computed(() => myHand.value.some(isJokerCard));
-  const jokerComboOptions = computed<JokerWithCardOption[]>(() => {
-    if (!isMyTurn.value || !humanHasJoker.value || !board.value) return [];
-    return getJokerWithCardOptions(myHand.value, board.value);
+
+  const joker = useJokerMode({
+    isPlayerTurn: isMyTurn,
+    hand: myHand,
+    board,
+    onPlaceJoker: (pos) => send({ type: "place-joker", position: pos }),
+    onPlaceJokerWithCard: (jokerPos, companionCard) =>
+      send({ type: "place-joker-with-card", jokerPos, companionCard }),
   });
-  const selectedJokerComboOption = computed<JokerWithCardOption | null>(() => {
-    const pos = selectedJokerPos.value;
-    if (!pos) return null;
-    return jokerComboOptions.value.find((opt) => areCardsEqual(opt.jokerPos, pos)) ?? null;
-  });
-  const comboHighlightPositions = computed<NormalCard[]>(() => {
-    if (!selectedJokerPos.value || !selectedJokerComboOption.value) return [];
-    return [selectedJokerPos.value, selectedJokerComboOption.value.companionCard];
-  });
-  const validJokerPositions = computed<NormalCard[]>(() => {
-    if (!jokerMode.value || selectedJokerPos.value || !board.value) return [];
-    return getValidJokerPositions(board.value);
-  });
+
   const currentSeatIndex = computed(() => room.value?.game?.currentSeatIndex ?? null);
   const gameStatus = computed((): GameStatusCode | "waiting" | "online-other-turn" => {
     if (!room.value || room.value.phase === "waiting") return "waiting";
     if (!isMyTurn.value) return "online-other-turn";
-    if (jokerMode.value) {
-      if (selectedJokerPos.value) return "human-joker-combo-select";
+    if (joker.jokerMode.value) {
+      if (joker.selectedJokerPos.value) return "human-joker-combo-select";
       return "human-joker-mode";
     }
     if (validCards.value.length > 0) return "human-place";
-    if (humanHasJoker.value && canPassTurn.value) return "human-joker-or-pass";
+    if (joker.humanHasJoker.value && canPassTurn.value) return "human-joker-or-pass";
     if (canPassTurn.value) return "human-must-pass";
     return "human-turn";
   });
@@ -140,7 +129,7 @@ export function useOnlineGame(roomId: string) {
           const hadJoker = prevHand.some(isJokerCard);
           const hasJoker = msg.room.game.myHand.some(isJokerCard);
           if (!hadJoker && hasJoker && msg.room.phase !== "gameover") {
-            showJokerNotification.value = true;
+            joker.notifyJokerReceived();
           }
         }
       } else if (msg.type === "error") {
@@ -175,7 +164,7 @@ export function useOnlineGame(roomId: string) {
 
   function playCard(card: Card) {
     if (!isMyTurn.value || isJokerCard(card)) return;
-    jokerMode.value = false;
+    joker.reset();
     send({ type: "play-card", card: card as NormalCard });
   }
 
@@ -186,50 +175,6 @@ export function useOnlineGame(roomId: string) {
 
   function startGame() {
     send({ type: "start-game" });
-  }
-
-  function enterJokerMode() {
-    if (!isMyTurn.value || !humanHasJoker.value) return;
-    jokerMode.value = true;
-  }
-
-  function cancelJokerMode() {
-    if (selectedJokerPos.value) {
-      selectedJokerPos.value = null;
-    } else {
-      jokerMode.value = false;
-    }
-  }
-
-  function placeJokerAtPosition(pos: NormalCard) {
-    if (!isMyTurn.value || !jokerMode.value) return;
-    const comboOption = jokerComboOptions.value.find((opt) => areCardsEqual(opt.jokerPos, pos));
-    if (comboOption) {
-      selectedJokerPos.value = pos;
-    } else {
-      jokerMode.value = false;
-      send({ type: "place-joker", position: pos });
-    }
-  }
-
-  function confirmJokerCombo() {
-    if (!selectedJokerComboOption.value || !isMyTurn.value) return;
-    const { jokerPos, companionCard } = selectedJokerComboOption.value;
-    jokerMode.value = false;
-    selectedJokerPos.value = null;
-    send({ type: "place-joker-with-card", jokerPos, companionCard });
-  }
-
-  function confirmJokerAlone() {
-    if (!selectedJokerPos.value || !isMyTurn.value) return;
-    const pos = selectedJokerPos.value;
-    jokerMode.value = false;
-    selectedJokerPos.value = null;
-    send({ type: "place-joker", position: pos });
-  }
-
-  function dismissJokerNotification() {
-    showJokerNotification.value = false;
   }
 
   function loadSession(): StoredSession | null {
@@ -262,27 +207,14 @@ export function useOnlineGame(roomId: string) {
     isMyTurn,
     validCards,
     canPassTurn,
-    humanHasJoker,
-    jokerMode,
-    selectedJokerPos,
-    validJokerPositions,
-    jokerComboOptions,
-    selectedJokerComboOption,
-    comboHighlightPositions,
-    showJokerNotification,
     currentSeatIndex,
     gameStatus,
     turnTimeRemaining,
+    ...joker,
     connect,
     disconnect,
     playCard,
     pass,
     startGame,
-    enterJokerMode,
-    cancelJokerMode,
-    placeJokerAtPosition,
-    confirmJokerCombo,
-    confirmJokerAlone,
-    dismissJokerNotification,
   };
 }

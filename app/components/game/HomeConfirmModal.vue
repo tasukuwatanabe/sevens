@@ -1,25 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import { useModalKeyboard } from "@/composables/useModalKeyboard";
 
 const emit = defineEmits<{
   confirm: [];
   cancel: [];
 }>();
 
-const cancelButtonRef = ref<HTMLButtonElement | null>(null);
-
-function handleKeyDown(e: KeyboardEvent) {
-  if (e.key === "Escape") emit("cancel");
-}
-
-onMounted(() => {
-  cancelButtonRef.value?.focus();
-  document.addEventListener("keydown", handleKeyDown);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("keydown", handleKeyDown);
-});
+const { buttonRef } = useModalKeyboard(() => emit("cancel"));
 </script>
 
 <template>
@@ -34,7 +21,7 @@ onUnmounted(() => {
       <p class="text-gray-600 mb-6">トップページに戻りますか？現在のゲームは中断されます。</p>
       <div class="flex gap-3 justify-center">
         <button
-          ref="cancelButtonRef"
+          ref="buttonRef"
           class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 focus-visible:outline-none"
           @click="emit('cancel')"
         >

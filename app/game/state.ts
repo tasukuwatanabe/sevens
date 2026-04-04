@@ -1,4 +1,4 @@
-import type { Card, NormalCard, GameState, PlayerId, Board, Player } from "@/types/game";
+import type { Card, NormalCard, GameState, Board, Player } from "@/types/game";
 import { SUITS, INITIAL_RANK, PLAYER_COUNT } from "./constants";
 import { createDeck, shuffleDeck, dealCards, JOKER_CARD } from "./deck";
 import { areCardsEqual, isJokerCard } from "@/utils/card";
@@ -89,15 +89,23 @@ export function placeCard(state: GameState, card: NormalCard): GameState {
   const newPlayers = updatePlayer(state.players, playerIndex, {
     hand: newHand,
   });
-  const winner: PlayerId | null = newHand.length === 0 ? player.id : null;
-
+  const nextIndex = (playerIndex + 1) % PLAYER_COUNT;
+  if (newHand.length === 0) {
+    return {
+      board: newBoard,
+      players: newPlayers,
+      currentPlayerIndex: nextIndex,
+      phase: "gameover",
+      winner: player.id,
+    };
+  }
   return {
     ...state,
     board: newBoard,
     players: newPlayers,
-    currentPlayerIndex: (playerIndex + 1) % PLAYER_COUNT,
-    winner,
-    phase: winner ? "gameover" : "playing",
+    currentPlayerIndex: nextIndex,
+    phase: "playing",
+    winner: null,
   };
 }
 
@@ -124,15 +132,23 @@ export function placeJoker(state: GameState, targetPos: NormalCard): GameState {
     newPlayers = updatePlayer(newPlayers, recipientIndex, { hand: recipientNewHand });
   }
 
-  const winner: PlayerId | null = holderNewHand.length === 0 ? holder.id : null;
-
+  const nextIndex = (holderIndex + 1) % PLAYER_COUNT;
+  if (holderNewHand.length === 0) {
+    return {
+      board: newBoard,
+      players: newPlayers,
+      currentPlayerIndex: nextIndex,
+      phase: "gameover",
+      winner: holder.id,
+    };
+  }
   return {
     ...state,
     board: newBoard,
     players: newPlayers,
-    currentPlayerIndex: (holderIndex + 1) % PLAYER_COUNT,
-    winner,
-    phase: winner ? "gameover" : "playing",
+    currentPlayerIndex: nextIndex,
+    phase: "playing",
+    winner: null,
   };
 }
 
@@ -165,15 +181,23 @@ export function placeJokerWithCard(
     newPlayers = updatePlayer(newPlayers, recipientIndex, { hand: recipientNewHand });
   }
 
-  const winner: PlayerId | null = holderNewHand.length === 0 ? holder.id : null;
-
+  const nextIndex = (holderIndex + 1) % PLAYER_COUNT;
+  if (holderNewHand.length === 0) {
+    return {
+      board: newBoard,
+      players: newPlayers,
+      currentPlayerIndex: nextIndex,
+      phase: "gameover",
+      winner: holder.id,
+    };
+  }
   return {
     ...state,
     board: newBoard,
     players: newPlayers,
-    currentPlayerIndex: (holderIndex + 1) % PLAYER_COUNT,
-    winner,
-    phase: winner ? "gameover" : "playing",
+    currentPlayerIndex: nextIndex,
+    phase: "playing",
+    winner: null,
   };
 }
 
