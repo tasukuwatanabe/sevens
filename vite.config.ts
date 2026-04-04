@@ -5,8 +5,7 @@ export default defineConfig({
     ignorePatterns: [],
   },
   staged: {
-    "*": "vp fmt",
-    "**/*.{ts,vue,js,cjs,mjs}": "vp check --fix",
+    "**/*.{ts,vue,js,cjs,mjs}": ["vp fmt", "vp check --fix"],
   },
   lint: { options: { typeAware: true, typeCheck: true } },
 });
