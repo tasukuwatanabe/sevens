@@ -100,7 +100,7 @@ export function useOnlineGame(roomId: string) {
     const config = useRuntimeConfig();
     const workerUrl = config.public.workerUrl as string;
     let wsUrl: string;
-    if (workerUrl) {
+    if (workerUrl && !workerUrl.includes("localhost")) {
       const base = workerUrl.replace(/^http/, "ws");
       wsUrl = `${base}/api/rooms/${roomId}/ws`;
     } else {
