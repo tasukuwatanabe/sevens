@@ -236,6 +236,15 @@ export class GameRoom implements DurableObject {
   }
 
   private async handleJoin(ws: WebSocket, playerName: string, room: RoomState): Promise<void> {
+    if (
+      typeof playerName !== "string" ||
+      playerName.trim().length === 0 ||
+      playerName.length > 50
+    ) {
+      this.sendError(ws, "INVALID_NAME", "名前が無効です（1〜50文字）");
+      return;
+    }
+
     if (room.phase === "destroyed") {
       this.sendError(ws, "ROOM_DESTROYED", "このルームは破棄されました");
       return;
