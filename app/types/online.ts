@@ -10,7 +10,7 @@ export interface SeatInfo {
   isConnected: boolean;
 }
 
-export type RoomPhase = "waiting" | "playing" | "gameover";
+export type RoomPhase = "waiting" | "playing" | "gameover" | "destroyed";
 
 export interface RoomState {
   roomId: string;

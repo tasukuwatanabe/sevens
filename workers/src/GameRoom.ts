@@ -131,6 +131,13 @@ export class GameRoom implements DurableObject {
     if (!session) return;
 
     const room = await this.loadRoom();
+
+    if (room.phase === "waiting" && session.seatIndex === room.hostSeatIndex) {
+      room.phase = "destroyed";
+      await this.saveAndBroadcast(room);
+      return;
+    }
+
     const seat = room.seats[session.seatIndex];
     if (seat) {
       seat.isConnected = false;
@@ -223,6 +230,11 @@ export class GameRoom implements DurableObject {
   }
 
   private async handleJoin(ws: WebSocket, playerName: string, room: RoomState): Promise<void> {
+    if (room.phase === "destroyed") {
+      this.sendError(ws, "ROOM_DESTROYED", "このルームは破棄されました");
+      return;
+    }
+
     if (room.phase !== "waiting") {
       this.sendError(ws, "GAME_STARTED", "ゲームは既に開始されています");
       return;

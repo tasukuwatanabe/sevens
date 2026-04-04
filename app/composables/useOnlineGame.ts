@@ -150,7 +150,9 @@ export function useOnlineGame(roomId: string) {
 
     ws.onclose = () => {
       connected.value = false;
-      reconnectTimer = setTimeout(() => connect(), 3000);
+      if (room.value?.phase !== "destroyed") {
+        reconnectTimer = setTimeout(() => connect(), 3000);
+      }
     };
 
     ws.onerror = () => {

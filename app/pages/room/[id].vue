@@ -128,6 +128,26 @@ function backToHome() {
     <NuxtLink to="/" class="text-green-300 underline text-sm mt-4">トップに戻る</NuxtLink>
   </div>
 
+  <!-- Destroyed room -->
+  <div
+    v-else-if="room.phase === 'destroyed'"
+    class="min-h-screen bg-green-900 text-white flex flex-col items-center justify-center p-4"
+  >
+    <div class="bg-white rounded-2xl shadow-xl p-8 text-center max-w-sm w-full mx-4">
+      <div class="text-4xl mb-3">🚫</div>
+      <h2 class="text-xl font-bold mb-2 text-gray-800">ルームは破棄されました</h2>
+      <p class="text-gray-500 mb-6 text-sm">
+        ルームを作成したプレイヤーが退出したため、このルームは利用できません。
+      </p>
+      <NuxtLink
+        to="/"
+        class="inline-block px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-colors"
+      >
+        トップに戻る
+      </NuxtLink>
+    </div>
+  </div>
+
   <!-- Waiting room (lobby) -->
   <div
     v-else-if="room.phase === 'waiting'"
