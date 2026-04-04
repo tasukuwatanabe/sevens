@@ -275,6 +275,7 @@ export class GameRoom implements DurableObject {
     const session: Session = { ...meta, ws };
     this.sessions.set(ws, session);
     ws.serializeAttachment(meta);
+    await this.state.storage.put(`token:${sessionToken}`, emptySeat.index);
 
     ws.send(
       JSON.stringify({
@@ -297,7 +298,12 @@ export class GameRoom implements DurableObject {
     seatIndex: SeatIndex,
     room: RoomState,
   ): Promise<void> {
-    // Find existing session with this token
+    const storedSeatIndex = await this.state.storage.get<SeatIndex>(`token:${sessionToken}`);
+    if (storedSeatIndex === undefined || storedSeatIndex !== seatIndex) {
+      this.sendError(ws, "INVALID_SESSION", "セッションが無効です");
+      return;
+    }
+
     for (const [existingWs, existingSession] of this.sessions) {
       if (existingSession.sessionToken === sessionToken) {
         this.sessions.delete(existingWs);
@@ -310,6 +316,10 @@ export class GameRoom implements DurableObject {
       }
     }
 
+    await this.state.storage.delete(`token:${sessionToken}`);
+    const newSessionToken = crypto.randomUUID();
+    await this.state.storage.put(`token:${newSessionToken}`, seatIndex);
+
     const seat = room.seats[seatIndex];
     if (!seat) {
       this.sendError(ws, "INVALID_SEAT", "無効な席番号です");
@@ -319,7 +329,7 @@ export class GameRoom implements DurableObject {
     seat.status = "human";
     seat.isConnected = true;
 
-    const meta: SessionMeta = { seatIndex, sessionToken };
+    const meta: SessionMeta = { seatIndex, sessionToken: newSessionToken };
     const session: Session = { ...meta, ws };
     this.sessions.set(ws, session);
     ws.serializeAttachment(meta);
@@ -327,6 +337,14 @@ export class GameRoom implements DurableObject {
     if (room.game) {
       room.game.players[seatIndex]!.type = "human";
     }
+
+    ws.send(
+      JSON.stringify({
+        type: "room-state",
+        room: this.buildClientView(room, session),
+        sessionToken: newSessionToken,
+      }),
+    );
 
     await this.saveAndBroadcast(room);
   }
