@@ -1,1 +1,4 @@
-approveBuilds: esbuild
+allowBuilds:
+  esbuild: true
+strictDepBuilds: true
+minimumReleaseAge: 4320
