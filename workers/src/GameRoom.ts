@@ -13,6 +13,7 @@ import {
   placeJoker,
   placeJokerWithCard,
   passTurn,
+  eliminatePlayer,
 } from "../../app/game/state";
 import { decideCpuAction } from "../../app/game/cpu";
 import {
@@ -21,6 +22,7 @@ import {
   getValidJokerPositions,
   getJokerWithCardOptions,
   canPass,
+  shouldEliminate,
 } from "../../app/game/rules";
 import { isJokerCard, areCardsEqual } from "../../app/utils/card";
 
@@ -69,6 +71,7 @@ function initGameForRoom(seats: SeatInfo[]): GameState {
     id: PLAYER_IDS[i]!,
     type: seat.status === "human" ? ("human" as const) : ("cpu" as const),
     name: seat.playerName ?? `CPU ${i}`,
+    eliminated: false,
   }));
   return { ...base, players };
 }
@@ -179,9 +182,23 @@ export class GameRoom implements DurableObject {
 
     const currentSeat = room.seats[room.game.currentPlayerIndex];
     if (currentSeat?.status === "human") {
-      room.game = passTurn(room.game);
+      const player = room.game.players[room.game.currentPlayerIndex]!;
+      if (shouldEliminate(player, room.game.board)) {
+        room.game = eliminatePlayer(room.game);
+      } else {
+        room.game = passTurn(room.game);
+      }
+
+      if (room.game.phase === "gameover") {
+        room.phase = "gameover";
+        room.turnDeadline = null;
+        await this.state.storage.deleteAlarm();
+      }
+
       await this.saveAndBroadcast(room);
-      await this.runCpuTurnLoop(room);
+      if (room.phase === "playing") {
+        await this.runCpuTurnLoop(room);
+      }
     }
   }
 
@@ -222,6 +239,7 @@ export class GameRoom implements DurableObject {
         myHand: myPlayer?.hand ?? [],
         handCounts: g.players.map((p) => p.hand.length),
         passesUsed: g.players.map((p) => p.passesUsed),
+        eliminated: g.players.map((p) => p.eliminated),
         winner: g.winner ? (g.players.findIndex((p) => p.id === g.winner) as SeatIndex) : null,
       };
     }
@@ -491,9 +509,11 @@ export class GameRoom implements DurableObject {
         const currentSeat = room.seats[room.game.currentPlayerIndex];
         if (!currentSeat || currentSeat.status !== "cpu") break;
 
+        const player = room.game.players[room.game.currentPlayerIndex]!;
+        if (player.eliminated) break;
+
         await sleep(CPU_DELAY_MS);
 
-        const player = room.game.players[room.game.currentPlayerIndex]!;
         const action = decideCpuAction(player, room.game.board, room.game.players);
 
         switch (action.type) {
@@ -505,6 +525,9 @@ export class GameRoom implements DurableObject {
             break;
           case "place-joker-with-card":
             room.game = placeJokerWithCard(room.game, action.jokerPos, action.companionCard);
+            break;
+          case "eliminate":
+            room.game = eliminatePlayer(room.game);
             break;
           case "pass":
             room.game = passTurn(room.game);

@@ -36,6 +36,10 @@ export function useOnlineGame(roomId: string) {
     const passesUsed = room.value.game.passesUsed[room.value.mySeatIndex] ?? 0;
     return passesUsed < MAX_PASSES && validCards.value.length === 0;
   });
+  const isEliminated = computed(() => {
+    if (!room.value?.game || room.value.mySeatIndex === null) return false;
+    return room.value.game.eliminated[room.value.mySeatIndex] ?? false;
+  });
 
   const joker = useJokerMode({
     isPlayerTurn: isMyTurn,
@@ -49,6 +53,7 @@ export function useOnlineGame(roomId: string) {
   const currentSeatIndex = computed(() => room.value?.game?.currentSeatIndex ?? null);
   const gameStatus = computed((): GameStatusCode | "waiting" | "online-other-turn" => {
     if (!room.value || room.value.phase === "waiting") return "waiting";
+    if (isEliminated.value) return "human-eliminated";
     if (!isMyTurn.value) return "online-other-turn";
     if (joker.jokerMode.value) {
       if (joker.selectedJokerPos.value) return "human-joker-combo-select";

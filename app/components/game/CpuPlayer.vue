@@ -9,6 +9,7 @@ const props = defineProps<{
   isCurrentTurn: boolean;
   isThinking: boolean;
   playerIndex: number;
+  eliminated: boolean;
 }>();
 
 const color = computed(() => CPU_PLAYER_COLORS[props.playerIndex] ?? CPU_PLAYER_COLORS[0]);
@@ -17,15 +18,26 @@ const color = computed(() => CPU_PLAYER_COLORS[props.playerIndex] ?? CPU_PLAYER_
 <template>
   <div
     class="flex flex-col items-center gap-1 px-2 py-1 sm:px-3 sm:py-2 rounded-lg border"
-    :class="isCurrentTurn || isThinking ? [color.border, color.bg] : 'border-gray-200 bg-gray-50'"
+    :class="
+      eliminated
+        ? 'border-gray-300 bg-gray-100 opacity-60'
+        : isCurrentTurn || isThinking
+          ? [color.border, color.bg]
+          : 'border-gray-200 bg-gray-50'
+    "
     :aria-current="isCurrentTurn ? 'true' : undefined"
   >
     <div class="text-xs font-semibold text-gray-700">{{ name }}</div>
-    <div class="text-sm font-bold text-gray-900">{{ handCount }}枚</div>
-    <div class="text-xs text-gray-500">パス {{ MAX_PASSES - passesUsed }}/{{ MAX_PASSES }}</div>
-    <div class="text-xs h-4 flex items-center justify-center">
-      <span v-if="isThinking" class="animate-pulse" :class="color.text">考え中…</span>
-      <span v-else-if="isCurrentTurn" class="font-semibold text-gray-700">ターン中</span>
-    </div>
+    <template v-if="eliminated">
+      <div class="text-sm font-bold text-red-500">脱落</div>
+    </template>
+    <template v-else>
+      <div class="text-sm font-bold text-gray-900">{{ handCount }}枚</div>
+      <div class="text-xs text-gray-500">パス {{ MAX_PASSES - passesUsed }}/{{ MAX_PASSES }}</div>
+      <div class="text-xs h-4 flex items-center justify-center">
+        <span v-if="isThinking" class="animate-pulse" :class="color.text">考え中…</span>
+        <span v-else-if="isCurrentTurn" class="font-semibold text-gray-700">ターン中</span>
+      </div>
+    </template>
   </div>
 </template>

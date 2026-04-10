@@ -4,6 +4,7 @@ import {
   isValidPlay,
   getValidJokerPositions,
   getJokerWithCardOptions,
+  canPass,
 } from "./rules";
 import type { JokerWithCardOption } from "./rules";
 import { areCardsEqual, isJokerCard } from "@/utils/card";
@@ -12,6 +13,7 @@ import { updateBoard } from "./state";
 export type CpuAction =
   | { type: "place"; card: NormalCard }
   | { type: "pass" }
+  | { type: "eliminate" }
   | { type: "place-joker"; position: NormalCard }
   | { type: "place-joker-with-card"; jokerPos: NormalCard; companionCard: NormalCard };
 
@@ -108,5 +110,5 @@ export function decideCpuAction(player: Player, board: Board, allPlayers: Player
     }
   }
 
-  return { type: "pass" };
+  return canPass(player) ? { type: "pass" } : { type: "eliminate" };
 }

@@ -24,6 +24,7 @@ function makePlayer(overrides: Partial<Player> = {}): Player {
     name: "CPU 1",
     hand: [],
     passesUsed: 0,
+    eliminated: false,
     ...overrides,
   };
 }
@@ -102,13 +103,13 @@ describe("decideCpuAction", () => {
     expect(action.type).toBe("pass");
   });
 
-  it("有効なカードがなくパス上限の場合もpassを返す（手詰まり防止）", () => {
+  it("有効なカードがなくパス上限の場合はeliminateを返す", () => {
     const player = makePlayer({
       hand: [{ suit: "spades", rank: 5 }],
       passesUsed: 3,
     });
     const action = decideCpuAction(player, makeBoard(), []);
-    expect(action.type).toBe("pass");
+    expect(action.type).toBe("eliminate");
   });
 
   it("複数の有効なカードがある場合はいずれかを選ぶ", () => {
@@ -174,9 +175,10 @@ describe("decideCpuAction", () => {
     }
   });
 
-  it("ジョーカーを持つが有効なジョーカー配置先がない場合はpassを返す", () => {
+  it("ジョーカーを持つが有効なジョーカー配置先がなくパスが残っている場合はpassを返す", () => {
     const player = makePlayer({
       hand: [JOKER_CARD, { suit: "spades", rank: 5 }],
+      passesUsed: 0,
     });
     const fullBoard: ReturnType<typeof makeBoard> = {
       spades: { suit: "spades", low: 1, high: 13 },
@@ -186,6 +188,21 @@ describe("decideCpuAction", () => {
     };
     const action = decideCpuAction(player, fullBoard, []);
     expect(action.type).toBe("pass");
+  });
+
+  it("ジョーカーを持つが有効なジョーカー配置先がなくパス上限の場合はeliminateを返す", () => {
+    const player = makePlayer({
+      hand: [JOKER_CARD, { suit: "spades", rank: 5 }],
+      passesUsed: 3,
+    });
+    const fullBoard: ReturnType<typeof makeBoard> = {
+      spades: { suit: "spades", low: 1, high: 13 },
+      hearts: { suit: "hearts", low: 1, high: 13 },
+      diamonds: { suit: "diamonds", low: 1, high: 13 },
+      clubs: { suit: "clubs", low: 1, high: 13 },
+    };
+    const action = decideCpuAction(player, fullBoard, []);
+    expect(action.type).toBe("eliminate");
   });
 
   it("place-jokerで人間が対象カードを持たない場合は最初のpositionを選ぶ", () => {
