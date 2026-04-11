@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vite-plus/test";
 import { createDeck, shuffleDeck, dealCards, JOKER_CARD } from "@/game/deck";
-import { isJokerCard } from "@/utils/card";
+import { isJokerCard, isNormalCard } from "@/utils/card";
 
 describe("createDeck", () => {
   it("53枚のカードを生成する（通常52枚＋ジョーカー1枚）", () => {
@@ -11,14 +11,14 @@ describe("createDeck", () => {
     const deck = createDeck();
     const suits = ["spades", "hearts", "diamonds", "clubs"] as const;
     for (const suit of suits) {
-      expect(deck.filter((c) => !isJokerCard(c) && (c as any).suit === suit)).toHaveLength(13);
+      expect(deck.filter((c) => isNormalCard(c) && c.suit === suit)).toHaveLength(13);
     }
   });
 
   it("各ランクがすべてのスートに存在する", () => {
     const deck = createDeck();
     for (let rank = 1; rank <= 13; rank++) {
-      expect(deck.filter((c) => !isJokerCard(c) && (c as any).rank === rank)).toHaveLength(4);
+      expect(deck.filter((c) => isNormalCard(c) && c.rank === rank)).toHaveLength(4);
     }
   });
 
@@ -47,14 +47,9 @@ describe("shuffleDeck", () => {
     expect(shuffled.length).toBe(deck.length);
     expect(shuffled.filter(isJokerCard)).toHaveLength(1);
     for (const card of deck) {
-      if (isJokerCard(card)) continue;
+      if (!isNormalCard(card)) continue;
       expect(
-        shuffled.some(
-          (c) =>
-            !isJokerCard(c) &&
-            (c as any).suit === (card as any).suit &&
-            (c as any).rank === (card as any).rank,
-        ),
+        shuffled.some((c) => isNormalCard(c) && c.suit === card.suit && c.rank === card.rank),
       ).toBe(true);
     }
   });

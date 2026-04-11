@@ -59,3 +59,7 @@ Pure TypeScript modules with no Vue dependencies — all state transitions are i
 ### Tailwind
 
 Dynamic suit colors (`blue`/`orange`/`violet`) are safelisted in `tailwind.config.ts` because they're generated at runtime.
+
+## Code Quality
+
+See [**`docs/type.md`**](docs/type.md) for type safety guidelines and best practices.

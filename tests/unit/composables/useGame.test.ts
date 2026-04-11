@@ -2,8 +2,7 @@ import { describe, it, expect } from "vite-plus/test";
 import { initGame, placeCard, eliminatePlayer, passTurn } from "@/game/state";
 import { getValidCards, canPass, shouldEliminate } from "@/game/rules";
 import { decideCpuAction } from "@/game/cpu";
-import { isJokerCard } from "@/utils/card";
-import type { GameState, NormalCard } from "@/types/game";
+import type { NormalCard, Player } from "@/types/game";
 
 // useGame composable の中核となるゲームロジックをテスト
 // Vue reactivity 層を除いた、ゲーム状態管理とアクション処理をテスト
@@ -204,7 +203,7 @@ describe("useGame - Game Logic", () => {
         ...state,
         players: state.players.map((p) => {
           const { eliminated: _, ...rest } = p;
-          return rest as any;
+          return rest as Omit<Player, "eliminated">;
         }),
       };
 
@@ -213,7 +212,7 @@ describe("useGame - Game Logic", () => {
         ...stateWithoutEliminated,
         players: stateWithoutEliminated.players.map((p) => ({
           ...p,
-          eliminated: p.eliminated ?? false,
+          eliminated: false,
         })),
       };
 

@@ -1,5 +1,4 @@
 import type { Suit, Rank, Card, NormalCard, JokerCard } from "@/types/game";
-import { SUITS } from "@/game/constants";
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
   spades: "♠",
@@ -33,6 +32,10 @@ const SUIT_LABELS: Record<Suit, string> = {
 
 export function isJokerCard(card: Card): card is JokerCard {
   return (card as JokerCard).isJoker === true;
+}
+
+export function isNormalCard(card: Card): card is NormalCard {
+  return !isJokerCard(card);
 }
 
 export function suitSymbol(suit: Suit) {

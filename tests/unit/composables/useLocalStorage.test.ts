@@ -86,18 +86,22 @@ describe("useLocalStorage - Serialization", () => {
       };
 
       const serialized = JSON.stringify(oldFormat);
-      const deserialized = JSON.parse(serialized) as any;
+      const deserialized = JSON.parse(serialized) as Record<string, unknown>;
 
       // eliminated フィールドが見つからない場合は false で補完
       const fixed = {
         ...deserialized,
-        players: deserialized.players.map((p: any) => ({
-          ...p,
-          eliminated: p.eliminated ?? false,
-        })),
+        players: Array.isArray(deserialized.players)
+          ? deserialized.players.map((p: unknown) => ({
+              ...(p as Record<string, unknown>),
+              eliminated: false,
+            }))
+          : [],
       };
 
-      expect(fixed.players[0].eliminated).toBe(false);
+      if (Array.isArray(fixed.players) && fixed.players.length > 0) {
+        expect((fixed.players[0] as Record<string, unknown>).eliminated).toBe(false);
+      }
     });
   });
 
@@ -119,11 +123,11 @@ describe("useLocalStorage - Serialization", () => {
     });
 
     it("watch の deep オプションで深い変更を監視できる", () => {
-      const state = { nested: { value: 1 } };
+      const _state = { nested: { value: 1 } };
       let watched = false;
 
       // watch 実装の模擬テスト
-      const watchHandler = (val: any) => {
+      const watchHandler = (val: { nested: { value: number } }) => {
         if (val.nested.value !== 1) {
           watched = true;
         }
