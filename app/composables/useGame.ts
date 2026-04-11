@@ -10,15 +10,12 @@ import {
 import { decideCpuAction } from "@/game/cpu";
 import { getValidCards, canPass, shouldEliminate } from "@/game/rules";
 import { isJokerCard } from "@/utils/card";
+import { sleep } from "@/utils/helpers";
 import { useLocalStorage } from "./useLocalStorage";
 import { useJokerMode } from "./useJokerMode";
 import { CPU_THINK_MS } from "@/game/constants";
 
 const STORAGE_KEY = "sevens-state";
-
-function sleep(ms: number) {
-  return new Promise<void>((resolve) => setTimeout(resolve, ms));
-}
 
 export function useGame() {
   const state = useLocalStorage<GameState>(STORAGE_KEY, initGame());

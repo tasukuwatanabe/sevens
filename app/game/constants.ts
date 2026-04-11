@@ -7,6 +7,13 @@ export const MAX_PASSES = 3;
 export const PLAYER_COUNT = 4;
 export const CPU_THINK_MS = 1500;
 
+// Timeout and delay constants
+export const TURN_TIMEOUT_MS = 60_000;
+export const CPU_DELAY_MS = 800;
+export const COPY_FEEDBACK_DELAY_MS = 2000;
+export const JOKER_NOTIFICATION_DELAY_MS = 3000;
+export const RECONNECT_DELAY_MS = 3000;
+
 export const CPU_PLAYER_COLORS = [
   { border: "border-blue-400", bg: "bg-blue-50", text: "text-blue-500" },
   { border: "border-orange-400", bg: "bg-orange-50", text: "text-orange-500" },

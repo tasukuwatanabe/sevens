@@ -25,9 +25,9 @@ import {
   shouldEliminate,
 } from "../../app/game/rules";
 import { isJokerCard, areCardsEqual } from "../../app/utils/card";
+import { sleep } from "../../app/utils/helpers";
+import { TURN_TIMEOUT_MS, CPU_DELAY_MS } from "../../app/game/constants";
 
-const TURN_TIMEOUT_MS = 60_000;
-const CPU_DELAY_MS = 800;
 const PLAYER_IDS: PlayerId[] = ["human", "cpu1", "cpu2", "cpu3"];
 
 interface SessionMeta {
@@ -37,10 +37,6 @@ interface SessionMeta {
 
 interface Session extends SessionMeta {
   ws: WebSocket;
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((r) => setTimeout(r, ms));
 }
 
 function createEmptySeats(): SeatInfo[] {

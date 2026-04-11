@@ -155,9 +155,27 @@ function handleJokerPlace(suit: Suit, rank: Rank) {
       @go-home="navigateTo('/')"
     />
 
-    <ResetConfirmModal v-if="showResetConfirm" @confirm="confirmReset" @cancel="cancelReset" />
+    <ConfirmModal
+      v-if="showResetConfirm"
+      title="確認"
+      message="ゲームをリセットしますか？現在のゲーム状態は削除されます。"
+      confirm-text="リセット"
+      cancel-text="キャンセル"
+      is-dangerous
+      @confirm="confirmReset"
+      @cancel="cancelReset"
+    />
 
-    <HomeConfirmModal v-if="showHomeConfirm" @confirm="confirmHome" @cancel="cancelHome" />
+    <ConfirmModal
+      v-if="showHomeConfirm"
+      title="ゲームを中断"
+      message="トップページに戻りますか？現在のゲームは中断されます。"
+      confirm-text="トップに戻る"
+      cancel-text="続ける"
+      is-dangerous
+      @confirm="confirmHome"
+      @cancel="cancelHome"
+    />
 
     <JokerReceivedOverlay v-if="showJokerNotification" @close="dismissJokerNotification" />
   </div>
