@@ -14,7 +14,7 @@ import { useLocalStorage } from "./useLocalStorage";
 import { useJokerMode } from "./useJokerMode";
 import { CPU_THINK_MS } from "@/game/constants";
 
-const STORAGE_KEY = "sevens-game-state";
+const STORAGE_KEY = "sevens-state";
 
 function sleep(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms));
