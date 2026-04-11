@@ -1,4 +1,5 @@
 import type { Suit, Rank, Card, NormalCard, JokerCard } from "@/types/game";
+import { SUITS } from "@/game/constants";
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
   spades: "♠",
@@ -56,4 +57,17 @@ export function areCardsEqual(a: Card, b: Card): boolean {
     (a as NormalCard).suit === (b as NormalCard).suit &&
     (a as NormalCard).rank === (b as NormalCard).rank
   );
+}
+
+export function sortHand(cards: Card[]): Card[] {
+  return [...cards].sort((a, b) => {
+    const aJoker = isJokerCard(a);
+    const bJoker = isJokerCard(b);
+    if (aJoker && bJoker) return 0;
+    if (aJoker) return 1;
+    if (bJoker) return -1;
+    const suitDiff = SUITS.indexOf((a as NormalCard).suit) - SUITS.indexOf((b as NormalCard).suit);
+    if (suitDiff !== 0) return suitDiff;
+    return (a as NormalCard).rank - (b as NormalCard).rank;
+  });
 }
