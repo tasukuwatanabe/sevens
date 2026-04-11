@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SUITS, MAX_PASSES } from "@/game/constants";
 import { useOnlineGame } from "@/composables/useOnlineGame";
-import { rankLabel, suitSymbol } from "@/utils/card";
+import { getCompanionLabel } from "@/utils/joker";
 import type { Suit, Rank, NormalCard } from "@/types/game";
 
 const route = useRoute();
@@ -54,12 +54,6 @@ function joinWithName() {
   needsName.value = false;
   connect(nameInput.value.trim());
 }
-
-const companionLabel = computed(() => {
-  const c = selectedJokerComboOption.value?.companionCard;
-  if (!c) return "";
-  return `${suitSymbol(c.suit)}${rankLabel(c.rank)}`;
-});
 
 function handleJokerPlace(suit: Suit, rank: Rank) {
   placeJokerAtPosition({ suit, rank } as NormalCard);
@@ -252,7 +246,8 @@ function backToHome() {
           class="px-4 py-2 rounded-lg bg-yellow-500 text-white font-medium hover:bg-yellow-600 transition-colors cursor-pointer"
           @click="confirmJokerCombo"
         >
-          コンボで出す（ジョーカー + {{ companionLabel }}）
+          コンボで出す（ジョーカー +
+          {{ getCompanionLabel(selectedJokerComboOption?.companionCard) }}）
         </button>
         <button
           class="px-4 py-2 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors cursor-pointer"
@@ -306,32 +301,16 @@ function backToHome() {
 
     <JokerReceivedOverlay v-if="showJokerNotification" @close="dismissJokerNotification" />
 
-    <!-- Leave confirm modal -->
-    <div
+    <ConfirmModal
       v-if="showLeaveConfirm"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div class="bg-white rounded-2xl shadow-xl p-8 text-center max-w-sm w-full mx-4">
-        <h2 class="text-xl font-bold mb-3 text-gray-800">ルームを退出</h2>
-        <p class="text-gray-600 mb-6">退出すると、ゲームに戻ることはできません。退出しますか？</p>
-        <div class="flex gap-3 justify-center">
-          <button
-            class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-colors cursor-pointer"
-            @click="showLeaveConfirm = false"
-          >
-            キャンセル
-          </button>
-          <button
-            class="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold transition-colors cursor-pointer"
-            @click="backToHome"
-          >
-            退出する
-          </button>
-        </div>
-      </div>
-    </div>
+      title="ルームを退出"
+      message="退出すると、ゲームに戻ることはできません。退出しますか？"
+      confirm-text="退出する"
+      cancel-text="キャンセル"
+      is-dangerous
+      @confirm="backToHome"
+      @cancel="showLeaveConfirm = false"
+    />
 
     <p v-if="error" class="text-center text-red-400 text-sm">{{ error }}</p>
   </div>

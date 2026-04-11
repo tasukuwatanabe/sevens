@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { COPY_FEEDBACK_DELAY_MS } from "@/game/constants";
+
 const props = defineProps<{
   roomUrl: string;
 }>();
@@ -12,7 +14,7 @@ const copied = ref(false);
 async function copyUrl() {
   await navigator.clipboard.writeText(props.roomUrl);
   copied.value = true;
-  setTimeout(() => (copied.value = false), 2000);
+  setTimeout(() => (copied.value = false), COPY_FEEDBACK_DELAY_MS);
 }
 
 function shareLine() {

@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { JOKER_NOTIFICATION_DELAY_MS } from "@/game/constants";
+
 const emit = defineEmits<{ close: [] }>();
 
 onMounted(() => {
-  setTimeout(() => emit("close"), 3000);
+  setTimeout(() => emit("close"), JOKER_NOTIFICATION_DELAY_MS);
 });
 </script>
 

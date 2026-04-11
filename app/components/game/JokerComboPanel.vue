@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { JokerWithCardOption } from "@/game/rules";
-import { rankLabel, suitSymbol } from "@/utils/card";
-import { computed } from "vue";
+import { getCompanionLabel } from "@/utils/joker";
 
 const props = defineProps<{
   selectedJokerComboOption: JokerWithCardOption | null;
@@ -14,12 +13,6 @@ const emit = defineEmits<{
   confirmAlone: [];
   cancel: [];
 }>();
-
-const companionLabel = computed(() => {
-  const c = props.selectedJokerComboOption?.companionCard;
-  if (!c) return "";
-  return `${suitSymbol(c.suit)}${rankLabel(c.rank)}`;
-});
 </script>
 
 <template>
@@ -28,7 +21,7 @@ const companionLabel = computed(() => {
       class="px-4 py-2 rounded-lg bg-yellow-500 text-white font-medium hover:bg-yellow-600 transition-colors"
       @click="emit('confirmCombo')"
     >
-      コンボで出す（ジョーカー + {{ companionLabel }}）
+      コンボで出す（ジョーカー + {{ getCompanionLabel(selectedJokerComboOption?.companionCard) }}）
     </button>
     <button
       class="px-4 py-2 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors"

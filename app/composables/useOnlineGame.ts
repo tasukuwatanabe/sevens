@@ -3,7 +3,7 @@ import type { ClientMessage, ClientRoomView, SeatIndex, ServerMessage } from "@/
 import { getValidCards } from "@/game/rules";
 import { isJokerCard } from "@/utils/card";
 import { useJokerMode } from "./useJokerMode";
-import { MAX_PASSES } from "@/game/constants";
+import { MAX_PASSES, RECONNECT_DELAY_MS } from "@/game/constants";
 
 const SESSION_KEY = "sevens-online-session";
 
@@ -145,7 +145,7 @@ export function useOnlineGame(roomId: string) {
     ws.onclose = () => {
       connected.value = false;
       if (room.value?.phase !== "destroyed") {
-        reconnectTimer = setTimeout(() => connect(), 3000);
+        reconnectTimer = setTimeout(() => connect(), RECONNECT_DELAY_MS);
       }
     };
 
