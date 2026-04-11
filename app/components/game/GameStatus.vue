@@ -13,6 +13,7 @@ const STATUS_MESSAGES: Record<GameStatusCode, (name: string) => string> = {
   "human-must-pass": () => "置けるカードがありません。パスしてください",
   "human-joker-or-pass": () => "置けるカードがありません。ジョーカーを出すかパスしてください",
   "human-turn": () => "あなたのターン",
+  "human-eliminated": () => "パスの上限に達しました。脱落です…",
   "cpu-turn": (name) => `${name}のターン`,
   "human-joker-mode": () => "ジョーカーを置く場所を選んでください",
   "human-joker-combo-select": () => "ジョーカーと一緒にカードを出しますか？",
@@ -24,6 +25,7 @@ const isHumanTurn = computed(
     props.status === "human-must-pass" ||
     props.status === "human-joker-or-pass" ||
     props.status === "human-turn" ||
+    props.status === "human-eliminated" ||
     props.status === "human-joker-mode" ||
     props.status === "human-joker-combo-select",
 );

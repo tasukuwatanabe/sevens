@@ -2,6 +2,10 @@ name = "sevens-game"
 main = "src/index.ts"
 compatibility_date = "2025-04-01"
 
+[build]
+command = "pnpm install --frozen-lockfile && pnpm build"
+cwd = ".."
+
 [assets]
 directory = "../.output/public"
 not_found_handling = "single-page-application"

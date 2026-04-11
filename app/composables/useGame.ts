@@ -1,7 +1,14 @@
 import type { Card, NormalCard, GameState, GameStatusCode } from "@/types/game";
-import { initGame, placeCard, placeJoker, placeJokerWithCard, passTurn } from "@/game/state";
+import {
+  initGame,
+  placeCard,
+  placeJoker,
+  placeJokerWithCard,
+  passTurn,
+  eliminatePlayer,
+} from "@/game/state";
 import { decideCpuAction } from "@/game/cpu";
-import { getValidCards, canPass } from "@/game/rules";
+import { getValidCards, canPass, shouldEliminate } from "@/game/rules";
 import { isJokerCard } from "@/utils/card";
 import { useLocalStorage } from "./useLocalStorage";
 import { useJokerMode } from "./useJokerMode";
@@ -15,6 +22,15 @@ function sleep(ms: number) {
 
 export function useGame() {
   const state = useLocalStorage<GameState>(STORAGE_KEY, initGame());
+
+  // localStorage後方互換: eliminatedが未定義の場合はfalseに設定
+  if (state.value.players.some((p) => p.eliminated === undefined)) {
+    state.value = {
+      ...state.value,
+      players: state.value.players.map((p) => ({ ...p, eliminated: p.eliminated ?? false })),
+    };
+  }
+
   const cpuThinking = ref(false);
   const thinkingPlayerId = ref<string | null>(null);
 
@@ -28,6 +44,9 @@ export function useGame() {
   );
   const canPassTurn = computed(
     () => isHumanTurn.value && canPass(currentPlayer.value) && validCards.value.length === 0,
+  );
+  const shouldBeEliminated = computed(
+    () => isHumanTurn.value && shouldEliminate(currentPlayer.value, state.value.board),
   );
 
   const joker = useJokerMode({
@@ -45,6 +64,7 @@ export function useGame() {
   const gameStatus = computed((): GameStatusCode => {
     if (cpuThinking.value) return "cpu-thinking";
     if (isHumanTurn.value) {
+      if (shouldBeEliminated.value) return "human-eliminated";
       if (joker.jokerMode.value) {
         if (joker.selectedJokerPos.value) return "human-joker-combo-select";
         return "human-joker-mode";
@@ -91,6 +111,8 @@ export function useGame() {
         state.value = placeJokerWithCard(state.value, action.jokerPos, action.companionCard);
       } else if (action.type === "place-joker") {
         state.value = placeJoker(state.value, action.position);
+      } else if (action.type === "eliminate") {
+        state.value = eliminatePlayer(state.value);
       } else {
         state.value = passTurn(state.value);
       }
@@ -126,6 +148,15 @@ export function useGame() {
       }
     },
   );
+
+  watch(shouldBeEliminated, async (val) => {
+    if (val) {
+      await sleep(CPU_THINK_MS);
+      if (shouldBeEliminated.value) {
+        state.value = eliminatePlayer(state.value);
+      }
+    }
+  });
 
   return {
     state,

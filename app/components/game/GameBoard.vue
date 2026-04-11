@@ -95,6 +95,7 @@ function handleJokerPlace(suit: Suit, rank: Rank) {
         :is-current-turn="currentPlayer.id === cpu.id"
         :is-thinking="thinkingPlayerId === cpu.id"
         :player-index="index"
+        :eliminated="cpu.eliminated"
       />
     </div>
 
@@ -113,8 +114,11 @@ function handleJokerPlace(suit: Suit, rank: Rank) {
 
     <div class="bg-green-800 rounded-xl p-2 sm:p-3">
       <div class="text-xs text-center mb-2 text-green-300">
-        {{ humanPlayer.name }}の手札（{{ humanPlayer.hand.length }}枚） — パス残り
-        {{ MAX_PASSES - humanPlayer.passesUsed }}/{{ MAX_PASSES }}
+        <template v-if="humanPlayer.eliminated"> {{ humanPlayer.name }} — 脱落 </template>
+        <template v-else>
+          {{ humanPlayer.name }}の手札（{{ humanPlayer.hand.length }}枚） — パス残り
+          {{ MAX_PASSES - humanPlayer.passesUsed }}/{{ MAX_PASSES }}
+        </template>
       </div>
       <PlayerHand
         :hand="humanPlayer.hand"

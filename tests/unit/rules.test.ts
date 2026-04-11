@@ -3,6 +3,7 @@ import {
   isValidPlay,
   getValidCards,
   canPass,
+  shouldEliminate,
   getValidJokerPositions,
   getJokerWithCardOptions,
 } from "@/game/rules";
@@ -121,7 +122,7 @@ describe("getValidCards", () => {
 
 describe("canPass", () => {
   function makePlayer(passesUsed: number): Player {
-    return { id: "human", type: "human", name: "test", hand: [], passesUsed };
+    return { id: "human", type: "human", name: "test", hand: [], passesUsed, eliminated: false };
   }
 
   it("パス未使用なら可能", () => {
@@ -134,6 +135,56 @@ describe("canPass", () => {
 
   it("3回使用で不可", () => {
     expect(canPass(makePlayer(3))).toBe(false);
+  });
+});
+
+describe("shouldEliminate", () => {
+  function makePlayer(overrides: Partial<Player> = {}): Player {
+    return {
+      id: "human",
+      type: "human",
+      name: "test",
+      hand: [],
+      passesUsed: 3,
+      eliminated: false,
+      ...overrides,
+    };
+  }
+
+  it("パス上限到達で出せるカードがない場合はtrue", () => {
+    const player = makePlayer({ hand: [{ suit: "spades", rank: 3 }] });
+    expect(shouldEliminate(player, makeBoard())).toBe(true);
+  });
+
+  it("パスがまだ残っている場合はfalse", () => {
+    const player = makePlayer({ passesUsed: 2, hand: [{ suit: "spades", rank: 3 }] });
+    expect(shouldEliminate(player, makeBoard())).toBe(false);
+  });
+
+  it("出せるカードがある場合はfalse", () => {
+    const player = makePlayer({ hand: [{ suit: "spades", rank: 6 }] });
+    expect(shouldEliminate(player, makeBoard())).toBe(false);
+  });
+
+  it("ジョーカーがあり有効な配置先がある場合はfalse", () => {
+    const player = makePlayer({ hand: [JOKER_CARD] });
+    expect(shouldEliminate(player, makeBoard())).toBe(false);
+  });
+
+  it("ジョーカーがあるが配置先がない場合はtrue", () => {
+    const fullBoard = makeBoard({
+      spades: { low: 1, high: 13 },
+      hearts: { low: 1, high: 13 },
+      diamonds: { low: 1, high: 13 },
+      clubs: { low: 1, high: 13 },
+    });
+    const player = makePlayer({ hand: [JOKER_CARD] });
+    expect(shouldEliminate(player, fullBoard)).toBe(true);
+  });
+
+  it("既に脱落済みの場合はfalse", () => {
+    const player = makePlayer({ eliminated: true });
+    expect(shouldEliminate(player, makeBoard())).toBe(false);
   });
 });
 

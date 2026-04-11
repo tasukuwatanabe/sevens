@@ -17,6 +17,14 @@ export function canPass(player: Player): boolean {
   return player.passesUsed < MAX_PASSES;
 }
 
+export function shouldEliminate(player: Player, board: Board): boolean {
+  if (player.eliminated) return false;
+  if (canPass(player)) return false;
+  if (getValidCards(player.hand, board).length > 0) return false;
+  if (player.hand.some(isJokerCard) && getValidJokerPositions(board).length > 0) return false;
+  return true;
+}
+
 export type JokerWithCardOption = {
   jokerPos: NormalCard;
   companionCard: NormalCard;
