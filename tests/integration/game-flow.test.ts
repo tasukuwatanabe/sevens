@@ -150,4 +150,108 @@ describe("ゲームフロー統合テスト", () => {
     expect(next.players[jokerHolder]!.hand.some(isJokerCard)).toBe(false);
     expect(next.players[recipientIndex]!.hand.some(isJokerCard)).toBe(true);
   });
+
+  it("複数プレイヤーが敗北する場合のゲーム流れが正常に機能する", () => {
+    // シナリオ: 複数プレイヤーが脱落し、最終的に1人のみ残る
+    let state = initGame();
+
+    // プレイヤー1を脱落させる準備
+    state.players[1]!.passesUsed = 3;
+    state.players[1]!.hand = [{ suit: "spades", rank: 3 }]; // 配置不可
+    state.currentPlayerIndex = 1;
+
+    // プレイヤー1を脱落させる
+    state = eliminatePlayer(state);
+    expect(state.players[1]!.eliminated).toBe(true);
+
+    // プレイヤー2を脱落させる準備
+    state.players[2]!.passesUsed = 3;
+    state.players[2]!.hand = [{ suit: "clubs", rank: 1 }]; // 配置不可
+    state.currentPlayerIndex = 2;
+
+    // プレイヤー2を脱落させる
+    state = eliminatePlayer(state);
+    expect(state.players[2]!.eliminated).toBe(true);
+
+    // ここまででプレイヤー0、3が残っている
+    expect(state.phase).toBe("playing"); // 2人以上残っているのでゲーム継続
+
+    // プレイヤー3を脱落させる準備
+    state.players[3]!.passesUsed = 3;
+    state.players[3]!.hand = [{ suit: "hearts", rank: 2 }]; // 配置不可
+    state.currentPlayerIndex = 3;
+
+    // プレイヤー3を脱落させる
+    state = eliminatePlayer(state);
+    expect(state.players[3]!.eliminated).toBe(true);
+
+    // ここでプレイヤー0のみ残ったはずなので、ゲーム終了
+    expect(state.phase).toBe("gameover");
+    expect(state.winner).toBe("human"); // プレイヤー0は human
+  });
+
+  it("ジョーカーが複数プレイヤーを経由して移譲される", () => {
+    // ジョーカー移譲の連鎖をテスト
+    let state = initGame();
+
+    // 初期状態: プレイヤーA がジョーカーを持っている
+    const holderA = state.players.findIndex((p) => p.hand.some(isJokerCard));
+    expect(holderA).toBeGreaterThanOrEqual(0);
+
+    // プレイヤーA がジョーカーを配置
+    const validPos1 = getValidJokerPositions(state.board)[0];
+    if (!validPos1) return;
+
+    // プレイヤーB がプレイヤーA が配置したジョーカーの対象カードを持っているか確認
+    const holderB = state.players.findIndex(
+      (p, i) =>
+        i !== holderA &&
+        p.hand.some(
+          (c) =>
+            !isJokerCard(c) &&
+            (c as NormalCard).suit === validPos1.suit &&
+            (c as NormalCard).rank === validPos1.rank,
+        ),
+    );
+
+    if (holderB === -1) return; // テスト条件が満たされない
+
+    state = { ...state, currentPlayerIndex: holderA };
+    state = placeJoker(state, validPos1);
+
+    // ジョーカーが A から B に移譲されたことを確認
+    expect(state.players[holderA]!.hand.some(isJokerCard)).toBe(false);
+    expect(state.players[holderB]!.hand.some(isJokerCard)).toBe(true);
+
+    // プレイヤーB がジョーカーを再配置
+    const validPos2 = getValidJokerPositions(state.board)[0];
+    if (!validPos2) return;
+
+    const holderC = state.players.findIndex(
+      (p, i) =>
+        i !== holderB &&
+        p.hand.some(
+          (c) =>
+            !isJokerCard(c) &&
+            (c as NormalCard).suit === validPos2.suit &&
+            (c as NormalCard).rank === validPos2.rank,
+        ),
+    );
+
+    if (holderC === -1) return;
+
+    state = { ...state, currentPlayerIndex: holderB };
+    state = placeJoker(state, validPos2);
+
+    // ジョーカーが B から C に移譲されたことを確認
+    expect(state.players[holderB]!.hand.some(isJokerCard)).toBe(false);
+    expect(state.players[holderC]!.hand.some(isJokerCard)).toBe(true);
+
+    // ジョーカーは全体で1枚のみ存在することを確認
+    const totalJokers = state.players.reduce(
+      (count, p) => count + (p.hand.some(isJokerCard) ? 1 : 0),
+      0,
+    );
+    expect(totalJokers).toBe(1);
+  });
 });
