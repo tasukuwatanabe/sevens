@@ -62,4 +62,4 @@ Dynamic suit colors (`blue`/`orange`/`violet`) are safelisted in `tailwind.confi
 
 ## Code Quality
 
-See [`.claude/rules`](.claude/rules) for coding standards and type safety guidelines.
+See [**`docs/type.md`**](docs/type.md) for type safety guidelines and best practices.
