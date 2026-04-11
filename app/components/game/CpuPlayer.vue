@@ -17,7 +17,7 @@ const color = computed(() => CPU_PLAYER_COLORS[props.playerIndex] ?? CPU_PLAYER_
 
 <template>
   <div
-    class="flex flex-col items-center gap-0.5 px-2 py-1 sm:gap-1 sm:px-3 sm:py-2 rounded-lg border leading-none"
+    class="flex flex-col items-center gap-0.5 px-2 py-0.5 sm:gap-1 sm:px-3 sm:py-2 rounded-lg border leading-none"
     :class="[
       eliminated
         ? 'border-gray-300 bg-gray-100 opacity-60'

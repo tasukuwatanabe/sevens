@@ -74,9 +74,9 @@ function handleJokerPlace(suit: Suit, rank: Rank) {
 </script>
 
 <template>
-  <div class="min-h-screen bg-green-900 text-white p-1 sm:p-4 flex flex-col gap-1 sm:gap-4">
+  <div class="min-h-screen bg-green-900 text-white p-0.5 sm:p-4 flex flex-col gap-0.5 sm:gap-4">
     <div class="flex items-center justify-center relative">
-      <h1 class="text-base sm:text-2xl font-bold">7並べ</h1>
+      <h1 class="text-base sm:text-2xl font-bold leading-none">7並べ</h1>
       <button
         class="absolute right-0 text-green-300 underline text-xs sm:text-sm cursor-pointer hover:text-green-100 transition-colors"
         @click="handleHomeRequest"
@@ -99,7 +99,7 @@ function handleJokerPlace(suit: Suit, rank: Rank) {
       />
     </div>
 
-    <div class="bg-green-800 rounded-xl p-1.5 sm:p-3 flex flex-col gap-1 sm:gap-1.5">
+    <div class="bg-green-800 rounded-xl p-1 sm:p-3 flex flex-col gap-0.5 sm:gap-1.5">
       <BoardRow
         v-for="suit in SUITS"
         :key="suit"
@@ -112,8 +112,8 @@ function handleJokerPlace(suit: Suit, rank: Rank) {
 
     <GameStatus :status="gameStatus" :player-name="currentPlayer.name" />
 
-    <div class="bg-green-800 rounded-xl p-1.5 sm:p-3">
-      <div class="text-xs text-center mb-1 sm:mb-2 text-green-300">
+    <div class="bg-green-800 rounded-xl p-1 sm:p-3">
+      <div class="text-xs text-center mb-0.5 sm:mb-2 text-green-300">
         <template v-if="humanPlayer.eliminated"> {{ humanPlayer.name }} — 脱落 </template>
         <template v-else>
           {{ humanPlayer.name }}の手札（{{ humanPlayer.hand.length }}枚） — パス残り
