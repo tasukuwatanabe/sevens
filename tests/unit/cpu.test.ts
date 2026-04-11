@@ -264,4 +264,60 @@ describe("decideCpuAction", () => {
       expect(action.jokerPos).toEqual({ suit: "hearts", rank: 8 });
     }
   });
+
+  it("人間が敗北済みの場合、CPU の decideCpuAction が正常に動作する", () => {
+    // CPU が人間をターゲットしようとするがアクセスできない敗北状態
+    const cpuPlayer = makePlayer({
+      id: "cpu1",
+      hand: [{ suit: "spades", rank: 6 }],
+    });
+    const humanPlayer = makePlayer({
+      id: "human",
+      type: "human",
+      hand: [{ suit: "spades", rank: 8 }],
+      eliminated: true, // 人間が既に敗北済み
+    });
+    const anotherCpuPlayer = makePlayer({
+      id: "cpu2",
+      hand: [{ suit: "hearts", rank: 8 }],
+    });
+
+    // CPU がクラッシュせずに正常に判定を返す
+    const action = decideCpuAction(cpuPlayer, makeBoard(), [
+      humanPlayer,
+      cpuPlayer,
+      anotherCpuPlayer,
+    ]);
+    expect(action.type).toBe("place");
+    if (action.type === "place") {
+      expect(action.card).toEqual({ suit: "spades", rank: 6 });
+    }
+  });
+
+  it("ボードが満杯でジョーカー配置位置がない場合、pass が残っていればpass、なければeliminate", () => {
+    const cpuPlayer = makePlayer({
+      id: "cpu1",
+      hand: [JOKER_CARD, { suit: "spades", rank: 5 }],
+      passesUsed: 0,
+    });
+    const fullBoard: ReturnType<typeof makeBoard> = {
+      spades: { suit: "spades", low: 1, high: 13 },
+      hearts: { suit: "hearts", low: 1, high: 13 },
+      diamonds: { suit: "diamonds", low: 1, high: 13 },
+      clubs: { suit: "clubs", low: 1, high: 13 },
+    };
+
+    // 満杯ボード + ジョーカー + 通常カードは無効 + パス残 → pass
+    const actionWithPass = decideCpuAction(cpuPlayer, fullBoard, []);
+    expect(actionWithPass.type).toBe("pass");
+
+    // 満杯ボード + ジョーカー + 通常カードは無効 + パス上限 → eliminate
+    const cpuPlayerNoPass = makePlayer({
+      id: "cpu1",
+      hand: [JOKER_CARD, { suit: "spades", rank: 5 }],
+      passesUsed: 3,
+    });
+    const actionWithoutPass = decideCpuAction(cpuPlayerNoPass, fullBoard, []);
+    expect(actionWithoutPass.type).toBe("eliminate");
+  });
 });
