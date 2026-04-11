@@ -1,41 +1,41 @@
-# Type Safety Guidelines
+# 型安全性ガイドライン
 
-## Overview
+## 概要
 
-This project enforces strict type safety to prevent runtime errors and improve code quality.
+このプロジェクトはランタイムエラーを防ぎ、コード品質を向上させるために厳格な型安全性を強制します。
 
-## Linting Rules
+## Lint ルール
 
-- **`@typescript-eslint/no-explicit-any`** — Forbidden
-  - Enforced by `vite.config.ts`
-  - Run `vp check` to catch violations
+- **`@typescript-eslint/no-explicit-any`** — 禁止
+  - `vite.config.ts` で強制
+  - `vp check` で違反をキャッチできます
 
-## Type Assertions Best Practices
+## 型アサーション・型ガードのベストプラクティス
 
-### Problem with Type Assertions
+### 型アサーションの問題点
 
-Type assertions (`as TypeName`) bypass TypeScript's type checking and are unsafe:
+型アサーション（`as TypeName`）はTypeScriptの型チェックをバイパスし、安全ではありません：
 
 ```ts
-// ❌ Unsafe - no type checking
+// ❌ 安全ではない - 型チェックがされない
 const card = someCard as NormalCard;
 ```
 
-### Solution: Use Type Guards
+### 解決策：型ガードを使用
 
-Type guards let TypeScript automatically narrow types:
+型ガードはTypeScriptが型を自動的に絞り込みます：
 
 ```ts
-// ✅ Safe - TypeScript checks this
+// ✅ 安全 - TypeScriptがチェック
 if (isNormalCard(card)) {
-  // card is guaranteed to be NormalCard here
-  card.suit; // ✓ type-safe access
+  // このブロック内では card は NormalCard で保証される
+  card.suit; // ✓ 型安全なアクセス
 }
 ```
 
-## Creating Type Guards
+## 型ガードの作成
 
-Use the `is` keyword to create type predicates:
+`is` キーワードを使用して型述語を作成：
 
 ```ts
 export function isNormalCard(card: Card): card is NormalCard {
@@ -43,68 +43,68 @@ export function isNormalCard(card: Card): card is NormalCard {
 }
 ```
 
-After the check, TypeScript automatically narrows the type:
+チェック後、TypeScriptは自動的に型を絞り込みます：
 
 ```ts
 const card: Card = getCard();
 
 if (isNormalCard(card)) {
-  // Inside this block, card is narrowed to NormalCard
-  console.log(card.suit); // ✓ TypeScript knows this property exists
+  // このブロック内では card は NormalCard に絞り込まれている
+  console.log(card.suit); // ✓ TypeScriptはこのプロパティが存在することを知っている
 }
 ```
 
-## Function Overloads
+## 関数オーバーロード
 
-When a function handles multiple input types differently:
+関数が複数の入力型を異なるように処理する場合：
 
 ```ts
-// Define overloads for each input type
+// 各入力型のオーバーロードを定義
 function processCard(card: JokerCard): void;
 function processCard(card: NormalCard): void;
 
-// Implementation handles all cases
+// 実装はすべてのケースを処理
 function processCard(card: Card): void {
   if (isJokerCard(card)) {
-    // handle joker
+    // ジョーカーを処理
   } else if (isNormalCard(card)) {
-    // handle normal card
+    // 通常のカードを処理
   }
 }
 ```
 
-## Available Type Guards
+## 利用可能な型ガード
 
-Located in `app/utils/card.ts`:
+`app/utils/card.ts` に配置：
 
 - `isJokerCard(card: Card): card is JokerCard`
 - `isNormalCard(card: Card): card is NormalCard`
 
-## Examples in This Project
+## このプロジェクト内の例
 
-### Example 1: app/utils/joker.ts
+### 例1：app/utils/joker.ts
 
 ```ts
 export function getCompanionLabel(card?: Card): string {
   if (!card || !isNormalCard(card)) return "";
-  // card is now narrowed to NormalCard
+  // card は NormalCard に絞り込まれている
   return `${suitSymbol(card.suit)}${rankLabel(card.rank)}`;
 }
 ```
 
-### Example 2: Tests
+### 例2：テスト
 
 ```ts
-// ✅ Good: Check type first, then access properties
+// ✅ 良い例：型をチェックしてからプロパティにアクセス
 expect(deck.filter((c) => isNormalCard(c) && c.suit === suit)).toHaveLength(13);
 ```
 
-## Summary
+## まとめ
 
-| Approach               | Safety    | Readability            |
-| ---------------------- | --------- | ---------------------- |
-| Type assertions (`as`) | ❌ Unsafe | ❌ Unclear intent      |
-| Type guards (`is`)     | ✅ Safe   | ✅ Clear type flow     |
-| Function overloads     | ✅ Safe   | ✅ Explicit signatures |
+| 方法                   | 安全性          | 可読性                |
+| ---------------------- | --------------- | --------------------- |
+| 型アサーション（`as`） | ❌ 安全ではない | ❌ 意図が不明確       |
+| 型ガード（`is`）       | ✅ 安全         | ✅ 型フローが明確     |
+| 関数オーバーロード     | ✅ 安全         | ✅ シグネチャが明示的 |
 
-Always prefer type guards over assertions.
+常に型アサーションより型ガードを優先してください。

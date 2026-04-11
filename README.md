@@ -36,12 +36,14 @@ pnpm install
 
 ## コマンド
 
+このプロジェクトは **Vite+** (`vp`) をツールチェーンとして使用します。
+
 ```bash
-pnpm dev       # 開発サーバー起動 (http://localhost:3000)
-pnpm build     # プロダクションビルド
-pnpm preview   # ビルド結果のプレビュー
-pnpm test      # テスト実行
-pnpm lint      # 型チェック・Lint
+vp dev       # 開発サーバー起動 (http://localhost:3000)
+vp build     # プロダクションビルド
+vp check     # 型チェック・Lint・フォーマット
+vp check --fix  # Lint・フォーマット問題を自動修正
+vp test run  # テスト実行
 ```
 
 ## プロジェクト構成
