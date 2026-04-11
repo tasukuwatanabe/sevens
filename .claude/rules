@@ -1,0 +1,41 @@
+# Coding Standards
+
+## Linting & Type Safety
+
+- **`any` type is forbidden** — enforced by `@typescript-eslint/no-explicit-any` (vite.config.ts)
+- **Minimize type assertions** — use type guards instead of `as` casts
+
+## Type Assertions Best Practices
+
+### ❌ Avoid type assertions:
+```ts
+const card = someCard as NormalCard;
+card.suit; // ✓ but unsafe
+```
+
+### ✅ Use type guards instead:
+```ts
+if (isNormalCard(card)) {
+  card.suit; // ✓ TypeScript-safe
+}
+```
+
+### Creating Type Guards
+```ts
+export function isNormalCard(card: Card): card is NormalCard {
+  return !isJokerCard(card);
+}
+```
+
+### Function Overloads
+For functions that handle multiple types:
+```ts
+function process(card: JokerCard): void;
+function process(card: NormalCard): void;
+function process(card: Card): void { ... }
+```
+
+## Available Type Guard Utilities
+
+- `isJokerCard(card: Card): card is JokerCard` — `app/utils/card.ts`
+- `isNormalCard(card: Card): card is NormalCard` — `app/utils/card.ts`

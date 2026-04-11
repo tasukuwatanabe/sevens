@@ -7,5 +7,10 @@ export default defineConfig({
   staged: {
     "**/*.{ts,vue,js,cjs,mjs}": ["vp fmt", "vp check --fix"],
   },
-  lint: { options: { typeAware: true, typeCheck: true } },
+  lint: {
+    options: { typeAware: true, typeCheck: true },
+    rules: {
+      "@typescript-eslint/no-explicit-any": "error",
+    },
+  },
 });

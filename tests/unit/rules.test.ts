@@ -7,8 +7,9 @@ import {
   getValidJokerPositions,
   getJokerWithCardOptions,
 } from "@/game/rules";
-import type { Board, Card, Player } from "@/types/game";
+import type { Board, Card, Player, Rank } from "@/types/game";
 import { JOKER_CARD } from "@/game/deck";
+import { isJokerCard, isNormalCard } from "@/utils/card";
 
 function makeBoard(overrides: Partial<Record<string, { low: number; high: number }>> = {}): Board {
   const defaults = {
@@ -21,23 +22,23 @@ function makeBoard(overrides: Partial<Record<string, { low: number; high: number
   return {
     spades: {
       suit: "spades",
-      low: merged.spades.low as any,
-      high: merged.spades.high as any,
+      low: merged.spades.low as Rank,
+      high: merged.spades.high as Rank,
     },
     hearts: {
       suit: "hearts",
-      low: merged.hearts.low as any,
-      high: merged.hearts.high as any,
+      low: merged.hearts.low as Rank,
+      high: merged.hearts.high as Rank,
     },
     diamonds: {
       suit: "diamonds",
-      low: merged.diamonds.low as any,
-      high: merged.diamonds.high as any,
+      low: merged.diamonds.low as Rank,
+      high: merged.diamonds.high as Rank,
     },
     clubs: {
       suit: "clubs",
-      low: merged.clubs.low as any,
-      high: merged.clubs.high as any,
+      low: merged.clubs.low as Rank,
+      high: merged.clubs.high as Rank,
     },
   };
 }
@@ -101,8 +102,8 @@ describe("getValidCards", () => {
     ];
     const valid = getValidCards(hand, board);
     expect(valid).toHaveLength(2);
-    expect(valid.some((c) => (c as any).suit === "spades" && (c as any).rank === 6)).toBe(true);
-    expect(valid.some((c) => (c as any).suit === "hearts" && (c as any).rank === 8)).toBe(true);
+    expect(valid.some((c) => isNormalCard(c) && c.suit === "spades" && c.rank === 6)).toBe(true);
+    expect(valid.some((c) => isNormalCard(c) && c.suit === "hearts" && c.rank === 8)).toBe(true);
   });
 
   it("有効なカードがない場合は空配列", () => {
@@ -115,7 +116,7 @@ describe("getValidCards", () => {
     const board = makeBoard();
     const hand = [JOKER_CARD, { suit: "spades" as const, rank: 6 as const }];
     const valid = getValidCards(hand, board);
-    expect(valid.some((c) => (c as any).isJoker)).toBe(false);
+    expect(valid.some(isJokerCard)).toBe(false);
     expect(valid).toHaveLength(1);
   });
 });

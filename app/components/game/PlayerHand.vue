@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { Card } from "@/types/game";
-import { areCardsEqual, isJokerCard } from "@/utils/card";
+import { areCardsEqual, isJokerCard, isNormalCard } from "@/utils/card";
 
 const props = defineProps<{
   hand: Card[];
@@ -22,7 +22,8 @@ function isValid(card: Card) {
 
 function cardKey(card: Card, i: number) {
   if (isJokerCard(card)) return `joker-${i}`;
-  return `${(card as any).suit}-${(card as any).rank}-${i}`;
+  if (isNormalCard(card)) return `${card.suit}-${card.rank}-${i}`;
+  return `unknown-${i}`;
 }
 </script>
 
