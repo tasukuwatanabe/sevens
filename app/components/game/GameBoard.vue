@@ -76,16 +76,16 @@ function handleJokerPlace(suit: Suit, rank: Rank) {
 <template>
   <div class="min-h-screen bg-green-900 text-white p-2 sm:p-4 flex flex-col gap-2 sm:gap-4">
     <div class="flex items-center justify-center relative">
-      <h1 class="text-xl sm:text-2xl font-bold">7並べ</h1>
+      <h1 class="text-base sm:text-2xl font-bold">7並べ</h1>
       <button
-        class="absolute right-0 text-green-300 underline text-sm cursor-pointer hover:text-green-100 transition-colors"
+        class="absolute right-0 text-green-300 underline text-xs sm:text-sm cursor-pointer hover:text-green-100 transition-colors"
         @click="handleHomeRequest"
       >
         ホームへ戻る
       </button>
     </div>
 
-    <div class="flex justify-center gap-3">
+    <div class="flex justify-center gap-1.5 sm:gap-3">
       <CpuPlayer
         v-for="(cpu, index) in cpuPlayers"
         :key="cpu.id"
