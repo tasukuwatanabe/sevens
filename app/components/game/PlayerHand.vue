@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import type { Card } from "@/types/game";
-import { areCardsEqual, isJokerCard } from "@/utils/card";
+import { areCardsEqual, isJokerCard, sortHand } from "@/utils/card";
 
 const props = defineProps<{
   hand: Card[];
@@ -14,6 +15,8 @@ const emit = defineEmits<{
   "select-joker": [];
 }>();
 
+const sortedHand = computed(() => sortHand(props.hand));
+
 function isValid(card: Card) {
   if (isJokerCard(card)) return true;
   return props.validCards.some((c) => areCardsEqual(c, card));
@@ -26,9 +29,9 @@ function cardKey(card: Card, i: number) {
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-1 justify-center">
+  <div class="flex flex-wrap gap-0.5 sm:gap-1 justify-center">
     <HandCard
-      v-for="(card, i) in hand"
+      v-for="(card, i) in sortedHand"
       :key="cardKey(card, i)"
       :card="card"
       :is-valid="isValid(card)"

@@ -55,7 +55,7 @@ function handleClick() {
 
 <template>
   <button
-    class="w-10 h-14 sm:w-14 sm:h-20 rounded-lg border-2 flex flex-col items-center justify-center text-sm sm:text-base font-bold transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+    class="w-12 h-16 sm:w-14 sm:h-20 rounded-lg border-2 flex flex-col items-center justify-center gap-0.5 font-bold transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 focus-visible:outline-none"
     :class="buttonClasses"
     :disabled="isJoker ? disabled || isJokerMode : disabled || !isValid || isJokerMode"
     :aria-label="
@@ -66,12 +66,16 @@ function handleClick() {
     @click="handleClick"
   >
     <template v-if="isJoker">
-      <span aria-hidden="true" class="text-lg sm:text-xl">🃏</span>
-      <span aria-hidden="true" class="text-xs">JOKER</span>
+      <span aria-hidden="true" class="text-xl sm:text-2xl leading-none">🃏</span>
+      <span aria-hidden="true" class="text-[10px] sm:text-xs leading-none">JOKER</span>
     </template>
     <template v-else>
-      <span aria-hidden="true">{{ rankLabel((card as NormalCard).rank) }}</span>
-      <span aria-hidden="true">{{ suitSymbol((card as NormalCard).suit) }}</span>
+      <span aria-hidden="true" class="text-base sm:text-lg leading-none">{{
+        rankLabel((card as NormalCard).rank)
+      }}</span>
+      <span aria-hidden="true" class="text-lg sm:text-xl leading-none">{{
+        suitSymbol((card as NormalCard).suit)
+      }}</span>
     </template>
   </button>
 </template>
