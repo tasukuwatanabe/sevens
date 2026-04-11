@@ -1,4 +1,4 @@
-name = "sevens-game"
+name = "sevens"
 main = "workers/src/index.ts"
 compatibility_date = "2025-04-01"
 
