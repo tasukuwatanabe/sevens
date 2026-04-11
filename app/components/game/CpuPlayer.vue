@@ -17,14 +17,15 @@ const color = computed(() => CPU_PLAYER_COLORS[props.playerIndex] ?? CPU_PLAYER_
 
 <template>
   <div
-    class="flex flex-col items-center gap-0.5 px-1.5 py-0.5 sm:gap-1 sm:px-3 sm:py-2 rounded-lg border"
-    :class="
+    class="flex flex-col items-center gap-px px-1 py-0.5 sm:gap-1 sm:px-3 sm:py-2 rounded-lg border leading-none"
+    :class="[
       eliminated
         ? 'border-gray-300 bg-gray-100 opacity-60'
         : isCurrentTurn || isThinking
           ? [color.border, color.bg]
-          : 'border-gray-200 bg-gray-50'
-    "
+          : 'border-gray-200 bg-gray-50',
+      isThinking ? 'animate-pulse sm:animate-none' : '',
+    ]"
     :aria-current="isCurrentTurn ? 'true' : undefined"
   >
     <div class="text-[10px] sm:text-xs font-semibold text-gray-700">{{ name }}</div>
@@ -36,7 +37,7 @@ const color = computed(() => CPU_PLAYER_COLORS[props.playerIndex] ?? CPU_PLAYER_
       <div class="text-[10px] sm:text-xs text-gray-500">
         パス {{ MAX_PASSES - passesUsed }}/{{ MAX_PASSES }}
       </div>
-      <div class="text-[10px] sm:text-xs h-3 sm:h-4 flex items-center justify-center">
+      <div class="hidden sm:flex text-xs h-4 items-center justify-center">
         <span v-if="isThinking" class="animate-pulse" :class="color.text">考え中…</span>
         <span v-else-if="isCurrentTurn" class="font-semibold text-gray-700">ターン中</span>
       </div>
