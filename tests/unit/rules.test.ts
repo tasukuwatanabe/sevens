@@ -296,4 +296,34 @@ describe("getJokerWithCardOptions", () => {
     const hand: Card[] = [JOKER_CARD, { suit: "clubs", rank: 1 }];
     expect(getJokerWithCardOptions(hand, board)).toHaveLength(0);
   });
+
+  it("holder が jokerPos 本体のカードを持っている場合はコンボ候補として返さない（high側）", () => {
+    // 初期ボード: high=7 → jokerPos=♠8, companion=♠9
+    // holder が ♠8 を持っているとジョーカーは ♠8 の代替になりえないため除外
+    // (放置すると placeJokerWithCard で ♠8 が手札に残ってしまう)
+    const hand: Card[] = [JOKER_CARD, { suit: "spades", rank: 8 }, { suit: "spades", rank: 9 }];
+    expect(getJokerWithCardOptions(hand, makeBoard())).toHaveLength(0);
+  });
+
+  it("holder が jokerPos 本体のカードを持っている場合はコンボ候補として返さない（low側）", () => {
+    // 初期ボード: low=7 → jokerPos=♣6, companion=♣5
+    // holder が ♣6 を持っているためコンボ候補から除外
+    const hand: Card[] = [JOKER_CARD, { suit: "clubs", rank: 6 }, { suit: "clubs", rank: 5 }];
+    expect(getJokerWithCardOptions(hand, makeBoard())).toHaveLength(0);
+  });
+
+  it("別スートで holder が jokerPos を持っていても、影響のないスートのコンボは返す", () => {
+    // ♠ では holder が ♠8 を持っているためコンボ除外
+    // ♥ ではコンボが成立する（holder は ♥8 を持っていない）
+    const hand: Card[] = [
+      JOKER_CARD,
+      { suit: "spades", rank: 8 },
+      { suit: "spades", rank: 9 },
+      { suit: "hearts", rank: 9 },
+    ];
+    const options = getJokerWithCardOptions(hand, makeBoard());
+    expect(options).toHaveLength(1);
+    expect(options[0]!.jokerPos).toEqual({ suit: "hearts", rank: 8 });
+    expect(options[0]!.companionCard).toEqual({ suit: "hearts", rank: 9 });
+  });
 });
