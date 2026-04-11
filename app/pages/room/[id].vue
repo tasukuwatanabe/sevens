@@ -180,6 +180,7 @@ function backToHome() {
         :is-current-turn="room.game !== null && room.game.currentSeatIndex === seat.index"
         :hand-count="room.game?.handCounts[seat.index]"
         :passes-used="room.game?.passesUsed[seat.index]"
+        :eliminated="room.game?.eliminated[seat.index]"
         :is-me="seat.index === room.mySeatIndex"
       />
     </div>
@@ -205,6 +206,9 @@ function backToHome() {
       aria-live="polite"
     >
       <template v-if="gameStatus === 'online-other-turn'">{{ currentPlayerName }}のターン</template>
+      <template v-else-if="gameStatus === 'human-eliminated'"
+        >パスの上限に達しました。脱落です…</template
+      >
       <template v-else-if="gameStatus === 'human-place'">カードを選んで置いてください</template>
       <template v-else-if="gameStatus === 'human-must-pass'"
         >置けるカードがありません。パスしてください</template
@@ -225,8 +229,11 @@ function backToHome() {
     <!-- Hand -->
     <div v-if="room.game && room.mySeatIndex !== null" class="bg-green-800 rounded-xl p-2 sm:p-3">
       <div class="text-xs text-center mb-2 text-green-300">
-        あなたの手札（{{ room.game.myHand.length }}枚） — パス残り
-        {{ MAX_PASSES - (room.game.passesUsed[room.mySeatIndex] ?? 0) }}/{{ MAX_PASSES }}
+        <template v-if="room.game.eliminated[room.mySeatIndex]"> あなた — 脱落 </template>
+        <template v-else>
+          あなたの手札（{{ room.game.myHand.length }}枚） — パス残り
+          {{ MAX_PASSES - (room.game.passesUsed[room.mySeatIndex] ?? 0) }}/{{ MAX_PASSES }}
+        </template>
       </div>
       <PlayerHand
         :hand="room.game.myHand"

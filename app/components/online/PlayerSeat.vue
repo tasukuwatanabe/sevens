@@ -7,6 +7,7 @@ const props = defineProps<{
   isCurrentTurn: boolean;
   handCount?: number;
   passesUsed?: number;
+  eliminated?: boolean;
   isMe: boolean;
 }>();
 
@@ -23,13 +24,22 @@ const color = computed(() => SEAT_COLORS[props.seat.index] ?? SEAT_COLORS[0]);
 <template>
   <div
     class="flex flex-col items-center gap-1 px-2 py-1 sm:px-3 sm:py-2 rounded-lg border min-w-[5rem]"
-    :class="isCurrentTurn ? [color.border, color.bg] : 'border-gray-200 bg-gray-50'"
+    :class="
+      eliminated
+        ? 'border-gray-300 bg-gray-100 opacity-60'
+        : isCurrentTurn
+          ? [color.border, color.bg]
+          : 'border-gray-200 bg-gray-50'
+    "
   >
     <div class="text-xs font-semibold text-gray-700 truncate max-w-[6rem]">
       {{ seat.playerName ?? "空席" }}
       <span v-if="isMe" class="text-green-600">(自分)</span>
     </div>
     <div v-if="seat.status === 'empty'" class="text-xs text-gray-400">待機中…</div>
+    <template v-else-if="eliminated">
+      <div class="text-sm font-bold text-red-500">脱落</div>
+    </template>
     <template v-else>
       <div class="flex items-center gap-1">
         <span v-if="seat.status === 'cpu'" class="text-xs text-gray-400">CPU</span>

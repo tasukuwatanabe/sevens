@@ -55,5 +55,6 @@ export interface ClientGameView {
   myHand: Card[];
   handCounts: number[];
   passesUsed: number[];
+  eliminated: boolean[];
   winner: SeatIndex | null;
 }

@@ -2,6 +2,7 @@ import type { Card, NormalCard, GameState, Board, Player } from "@/types/game";
 import { SUITS, INITIAL_RANK, PLAYER_COUNT } from "./constants";
 import { createDeck, shuffleDeck, dealCards, JOKER_CARD } from "./deck";
 import { areCardsEqual, isJokerCard } from "@/utils/card";
+import { isValidPlay } from "./rules";
 
 function createInitialBoard(): Board {
   return Object.fromEntries(
@@ -31,6 +32,14 @@ function updatePlayer(players: Player[], index: number, updates: Partial<Player>
   return players.map((p, i) => (i === index ? { ...p, ...updates } : p));
 }
 
+export function nextActivePlayer(players: Player[], fromIndex: number): number {
+  for (let i = 1; i <= PLAYER_COUNT; i++) {
+    const idx = (fromIndex + i) % PLAYER_COUNT;
+    if (!players[idx]!.eliminated) return idx;
+  }
+  return (fromIndex + 1) % PLAYER_COUNT;
+}
+
 export function initGame(): GameState {
   const deck = shuffleDeck(createDeck());
   // 7はボードの起点として最初から置かれているため、手札に含めると
@@ -48,6 +57,7 @@ export function initGame(): GameState {
       name: "あなた",
       hand: hands.at(0) ?? [],
       passesUsed: 0,
+      eliminated: false,
     },
     {
       id: "cpu1",
@@ -55,6 +65,7 @@ export function initGame(): GameState {
       name: "CPU 1",
       hand: hands.at(1) ?? [],
       passesUsed: 0,
+      eliminated: false,
     },
     {
       id: "cpu2",
@@ -62,6 +73,7 @@ export function initGame(): GameState {
       name: "CPU 2",
       hand: hands.at(2) ?? [],
       passesUsed: 0,
+      eliminated: false,
     },
     {
       id: "cpu3",
@@ -69,6 +81,7 @@ export function initGame(): GameState {
       name: "CPU 3",
       hand: hands.at(3) ?? [],
       passesUsed: 0,
+      eliminated: false,
     },
   ];
 
@@ -89,7 +102,7 @@ export function placeCard(state: GameState, card: NormalCard): GameState {
   const newPlayers = updatePlayer(state.players, playerIndex, {
     hand: newHand,
   });
-  const nextIndex = (playerIndex + 1) % PLAYER_COUNT;
+  const nextIndex = nextActivePlayer(newPlayers, playerIndex);
   if (newHand.length === 0) {
     return {
       board: newBoard,
@@ -132,7 +145,7 @@ export function placeJoker(state: GameState, targetPos: NormalCard): GameState {
     newPlayers = updatePlayer(newPlayers, recipientIndex, { hand: recipientNewHand });
   }
 
-  const nextIndex = (holderIndex + 1) % PLAYER_COUNT;
+  const nextIndex = nextActivePlayer(newPlayers, holderIndex);
   if (holderNewHand.length === 0) {
     return {
       board: newBoard,
@@ -181,7 +194,7 @@ export function placeJokerWithCard(
     newPlayers = updatePlayer(newPlayers, recipientIndex, { hand: recipientNewHand });
   }
 
-  const nextIndex = (holderIndex + 1) % PLAYER_COUNT;
+  const nextIndex = nextActivePlayer(newPlayers, holderIndex);
   if (holderNewHand.length === 0) {
     return {
       board: newBoard,
@@ -211,6 +224,52 @@ export function passTurn(state: GameState): GameState {
   return {
     ...state,
     players: newPlayers,
-    currentPlayerIndex: (playerIndex + 1) % PLAYER_COUNT,
+    currentPlayerIndex: nextActivePlayer(newPlayers, playerIndex),
+  };
+}
+
+function placeEliminatedCards(board: Board, cards: Card[]): Board {
+  const normalCards = cards.filter((c): c is NormalCard => !isJokerCard(c));
+  let newBoard = board;
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const card of normalCards) {
+      if (isValidPlay(card, newBoard)) {
+        newBoard = updateBoard(newBoard, card);
+        changed = true;
+      }
+    }
+  }
+  return newBoard;
+}
+
+export function eliminatePlayer(state: GameState): GameState {
+  const playerIndex = state.currentPlayerIndex;
+  const player = state.players[playerIndex]!;
+
+  const newBoard = placeEliminatedCards(state.board, player.hand);
+  let newPlayers = updatePlayer(state.players, playerIndex, {
+    hand: [],
+    eliminated: true,
+  });
+
+  const activeCount = newPlayers.filter((p) => !p.eliminated).length;
+  if (activeCount <= 1) {
+    const lastPlayer = newPlayers.find((p) => !p.eliminated);
+    return {
+      board: newBoard,
+      players: newPlayers,
+      currentPlayerIndex: state.currentPlayerIndex,
+      phase: "gameover",
+      winner: lastPlayer?.id ?? player.id,
+    };
+  }
+
+  return {
+    ...state,
+    board: newBoard,
+    players: newPlayers,
+    currentPlayerIndex: nextActivePlayer(newPlayers, playerIndex),
   };
 }

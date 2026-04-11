@@ -1,8 +1,16 @@
 import { describe, it, expect } from "vite-plus/test";
-import { initGame, placeCard, placeJoker, placeJokerWithCard, passTurn } from "@/game/state";
+import {
+  initGame,
+  placeCard,
+  placeJoker,
+  placeJokerWithCard,
+  passTurn,
+  eliminatePlayer,
+  nextActivePlayer,
+} from "@/game/state";
 import { getValidCards } from "@/game/rules";
 import { isJokerCard } from "@/utils/card";
-import type { NormalCard } from "@/types/game";
+import type { NormalCard, GameState } from "@/types/game";
 import { JOKER_CARD } from "@/game/deck";
 
 describe("initGame", () => {
@@ -302,5 +310,111 @@ describe("passTurn", () => {
     const state = initGame();
     const next = passTurn(state);
     expect(next.currentPlayerIndex).toBe(1);
+  });
+
+  it("脱落済みプレイヤーをスキップする", () => {
+    const state = initGame();
+    state.players[1]!.eliminated = true;
+    const next = passTurn(state);
+    expect(next.currentPlayerIndex).toBe(2);
+  });
+});
+
+describe("nextActivePlayer", () => {
+  it("脱落していないプレイヤーを返す", () => {
+    const players = initGame().players;
+    expect(nextActivePlayer(players, 0)).toBe(1);
+  });
+
+  it("脱落済みプレイヤーをスキップする", () => {
+    const players = initGame().players;
+    players[1]!.eliminated = true;
+    expect(nextActivePlayer(players, 0)).toBe(2);
+  });
+
+  it("複数の脱落済みプレイヤーをスキップする", () => {
+    const players = initGame().players;
+    players[1]!.eliminated = true;
+    players[2]!.eliminated = true;
+    expect(nextActivePlayer(players, 0)).toBe(3);
+  });
+
+  it("ラップアラウンドで脱落済みをスキップする", () => {
+    const players = initGame().players;
+    players[0]!.eliminated = true;
+    expect(nextActivePlayer(players, 3)).toBe(1);
+  });
+});
+
+describe("eliminatePlayer", () => {
+  function makeEliminationState(): GameState {
+    const state = initGame();
+    // プレイヤー0に出せるカード（spades 6）と出せないカード（spades 3）を持たせる
+    state.players[0]!.hand = [
+      { suit: "spades", rank: 6 },
+      { suit: "spades", rank: 3 },
+    ];
+    state.players[0]!.passesUsed = 3;
+    return state;
+  }
+
+  it("プレイヤーがeliminatedになる", () => {
+    const state = makeEliminationState();
+    const next = eliminatePlayer(state);
+    expect(next.players[0]!.eliminated).toBe(true);
+  });
+
+  it("手札が空になる", () => {
+    const state = makeEliminationState();
+    const next = eliminatePlayer(state);
+    expect(next.players[0]!.hand).toHaveLength(0);
+  });
+
+  it("出せるカードがボードに配置される", () => {
+    const state = makeEliminationState();
+    const next = eliminatePlayer(state);
+    expect(next.board.spades.low).toBe(6);
+  });
+
+  it("ターンが次のアクティブプレイヤーに移る", () => {
+    const state = makeEliminationState();
+    const next = eliminatePlayer(state);
+    expect(next.currentPlayerIndex).toBe(1);
+  });
+
+  it("残り1人になるとgameoverになる", () => {
+    const state = makeEliminationState();
+    state.players[1]!.eliminated = true;
+    state.players[2]!.eliminated = true;
+    const next = eliminatePlayer(state);
+    expect(next.phase).toBe("gameover");
+    expect(next.winner).toBe("cpu3");
+  });
+
+  it("残り2人以上ならplayingのまま", () => {
+    const state = makeEliminationState();
+    const next = eliminatePlayer(state);
+    expect(next.phase).toBe("playing");
+  });
+
+  it("ジョーカーを持っている場合も脱落できる（ジョーカーは捨てられる）", () => {
+    const state = initGame();
+    state.players[0]!.hand = [JOKER_CARD];
+    state.players[0]!.passesUsed = 3;
+    const next = eliminatePlayer(state);
+    expect(next.players[0]!.eliminated).toBe(true);
+    expect(next.players[0]!.hand).toHaveLength(0);
+  });
+
+  it("連鎖的にカードが配置される", () => {
+    const state = initGame();
+    // spades 6 → low=6、次に spades 5 → low=5 が連鎖的に配置される
+    state.players[0]!.hand = [
+      { suit: "spades", rank: 5 },
+      { suit: "spades", rank: 6 },
+    ];
+    state.players[0]!.passesUsed = 3;
+    const next = eliminatePlayer(state);
+    expect(next.board.spades.low).toBe(5);
   });
 });

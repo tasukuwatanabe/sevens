@@ -14,6 +14,7 @@ export interface Player {
   name: string;
   hand: Card[];
   passesUsed: number;
+  eliminated: boolean;
 }
 
 export interface BoardSuit {
@@ -30,6 +31,7 @@ export type GameStatusCode =
   | "human-must-pass"
   | "human-joker-or-pass"
   | "human-turn"
+  | "human-eliminated"
   | "cpu-turn"
   | "human-joker-mode"
   | "human-joker-combo-select";
