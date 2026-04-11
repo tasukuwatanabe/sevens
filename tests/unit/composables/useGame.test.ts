@@ -33,17 +33,13 @@ describe("useGame - Game Logic", () => {
     it("placeCard でカードが配置される", () => {
       const state = initGame();
       const card: NormalCard = { suit: "spades", rank: 6 };
-      state.players[0]!.hand.push(card);
+      // 手札を明示的に置き換え（initGame で既に spades 6 が存在する可能性を排除）
+      state.players[0]!.hand = [card];
 
       const next = placeCard(state, card);
 
       expect(next.board.spades.low).toBe(6);
-      expect(
-        next.players[0]!.hand.some(
-          (c) =>
-            !isJokerCard(c) && (c as NormalCard).suit === "spades" && (c as NormalCard).rank === 6,
-        ),
-      ).toBe(false);
+      expect(next.players[0]!.hand).toHaveLength(0);
     });
 
     it("passTurn でターンが次のプレイヤーに移る", () => {
