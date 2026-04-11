@@ -1,0 +1,14 @@
+name = "sevens-game"
+main = "src/index.ts"
+compatibility_date = "2025-04-01"
+
+[assets]
+directory = "../.output/public"
+not_found_handling = "single-page-application"
+
+[durable_objects]
+bindings = [{ name = "GAME_ROOM", class_name = "GameRoom" }]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["GameRoom"]
