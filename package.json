@@ -12,20 +12,20 @@
     "test": "vp test run"
   },
   "dependencies": {
-    "vue": "3.5.30",
+    "vue": "3.5.32",
     "vue-router": "5.0.4"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20260408.1",
     "@tailwindcss/postcss": "4.2.2",
-    "@types/node": "22.9.3",
-    "@vitejs/plugin-vue": "5.0.5",
-    "@voidzero-dev/vite-plus-core": "0.1.13",
-    "autoprefixer": "10.4.20",
+    "@types/node": "24.12.2",
+    "@vitejs/plugin-vue": "6.0.5",
+    "@voidzero-dev/vite-plus-core": "0.1.15",
+    "autoprefixer": "10.4.27",
     "postcss": "8.5.9",
     "tailwindcss": "4.2.2",
-    "vite-plugin-pwa": "0.20.5",
-    "vite-plus": "0.1.13",
+    "vite-plugin-pwa": "1.2.0",
+    "vite-plus": "0.1.15",
     "vue-tsc": "3.2.6",
     "wrangler": "4.81.0"
   },
