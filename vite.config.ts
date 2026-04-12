@@ -1,9 +1,8 @@
 import { defineConfig } from "vite-plus";
-import vue from "@vitejs/plugin-vue";
 import { fileURLToPath, URL } from "node:url";
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [],
   resolve: {
     alias: { "@": fileURLToPath(new URL("./app", import.meta.url)) },
   },

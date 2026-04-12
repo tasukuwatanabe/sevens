@@ -18,13 +18,10 @@
   "devDependencies": {
     "@cloudflare/workers-types": "4.20260408.1",
     "@types/node": "22.9.3",
-    "@vitejs/plugin-vue": "5.0.5",
     "@voidzero-dev/vite-plus-core": "0.1.13",
     "autoprefixer": "10.4.20",
-    "esbuild": "^0.28.0",
     "postcss": "8.5.9",
     "tailwindcss": "3.4.19",
-    "vite": "5.4.11",
     "vite-plugin-pwa": "0.20.5",
     "vite-plus": "0.1.13",
     "vue-tsc": "3.2.6",
