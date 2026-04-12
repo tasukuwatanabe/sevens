@@ -11,8 +11,7 @@ import PlayerHand from "./PlayerHand.vue";
 import JokerComboPanel from "./JokerComboPanel.vue";
 import ActionButtons from "./ActionButtons.vue";
 import GameOverModal from "./GameOverModal.vue";
-import ResetConfirmModal from "./ResetConfirmModal.vue";
-import HomeConfirmModal from "./HomeConfirmModal.vue";
+import ConfirmModal from "../ui/ConfirmModal.vue";
 import JokerReceivedOverlay from "./JokerReceivedOverlay.vue";
 
 const router = useRouter();
@@ -166,7 +165,7 @@ function handleJokerPlace(suit: Suit, rank: Rank) {
       :winner="state.winner"
       :players="state.players"
       @reset="resetGame"
-      @go-home="navigateTo('/')"
+      @go-home="router.push('/')"
     />
 
     <ConfirmModal
