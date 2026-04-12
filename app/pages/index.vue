@@ -10,8 +10,8 @@ async function createRoom() {
   if (!playerName.value.trim()) return;
   isCreating.value = true;
   try {
-    const res = await fetch("/api/rooms", { method: "POST" }).then((r) =>
-      r.json() as Promise<{ roomId: string }>
+    const res = await fetch("/api/rooms", { method: "POST" }).then(
+      (r) => r.json() as Promise<{ roomId: string }>,
     );
     sessionStorage.setItem("sevens-player-name", playerName.value.trim());
     router.push(`/room/${res.roomId}`);

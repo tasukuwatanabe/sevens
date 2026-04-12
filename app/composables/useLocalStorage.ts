@@ -15,7 +15,7 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
     (val) => {
       localStorage.setItem(key, JSON.stringify(val));
     },
-    { deep: true }
+    { deep: true },
   );
 
   return state;
