@@ -126,11 +126,16 @@ export function placeJoker(state: GameState, targetPos: NormalCard): GameState {
   const holderIndex = state.currentPlayerIndex;
   const holder = state.players[holderIndex]!;
 
-  const holderNewHand = holder.hand.filter((c) => !isJokerCard(c));
+  let holderNewHand = holder.hand.filter((c) => !isJokerCard(c));
 
   const recipientIndex = state.players.findIndex((p) =>
     p.hand.some((c) => !isJokerCard(c) && areCardsEqual(c, targetPos)),
   );
+
+  // If the holder owns the target position card, remove it from their hand
+  if (recipientIndex === holderIndex) {
+    holderNewHand = removeFromHand(holderNewHand, targetPos);
+  }
 
   const newBoard = updateBoard(state.board, targetPos);
 
