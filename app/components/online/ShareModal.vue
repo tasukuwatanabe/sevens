@@ -20,7 +20,7 @@ async function copyUrl() {
 
 function shareLine() {
   const text = `7並べで対戦しよう！\n${props.roomUrl}`;
-  window.open(`https://line.me/R/share?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+  window.location.href = `line://msg/text/${encodeURIComponent(text)}`;
 }
 </script>
 
