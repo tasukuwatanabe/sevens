@@ -41,7 +41,7 @@ async function createRoom() {
         type="text"
         placeholder="名前を入力"
         maxlength="10"
-        class="px-4 py-3 rounded-xl text-gray-900 text-center text-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        class="bg-white border border-gray-300 placeholder-gray-400 px-4 py-3 rounded-xl text-gray-900 text-center text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-yellow-400"
         @keydown.enter="createRoom"
       />
       <button
