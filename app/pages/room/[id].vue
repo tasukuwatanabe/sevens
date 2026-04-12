@@ -11,6 +11,7 @@ import TurnTimer from "@/components/online/TurnTimer.vue";
 import BoardRow from "@/components/game/BoardRow.vue";
 import PlayerHand from "@/components/game/PlayerHand.vue";
 import JokerReceivedOverlay from "@/components/game/JokerReceivedOverlay.vue";
+import ConfirmModal from "@/components/ui/ConfirmModal.vue";
 
 const route = useRoute();
 const router = useRouter();
