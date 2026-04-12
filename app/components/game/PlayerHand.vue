@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import type { Card } from "@/types/game";
 import { areCardsEqual, isJokerCard, isNormalCard } from "@/utils/card";
+import { SUITS } from "@/game/constants";
 import HandCard from "./HandCard.vue";
 
 const props = defineProps<{
@@ -15,6 +16,24 @@ const emit = defineEmits<{
   play: [card: Card];
   "select-joker": [];
 }>();
+
+const sortedHand = computed(() => {
+  const normalCards = props.hand.filter(isNormalCard);
+  const jokerCards = props.hand.filter(isJokerCard);
+
+  const sorted = normalCards.sort((a, b) => {
+    const suitIndexA = SUITS.indexOf(a.suit);
+    const suitIndexB = SUITS.indexOf(b.suit);
+
+    if (suitIndexA !== suitIndexB) {
+      return suitIndexA - suitIndexB;
+    }
+
+    return a.rank - b.rank;
+  });
+
+  return [...sorted, ...jokerCards];
+});
 
 function isValid(card: Card) {
   if (isJokerCard(card)) return true;
@@ -31,7 +50,7 @@ function cardKey(card: Card, i: number) {
 <template>
   <div class="flex flex-wrap gap-0.5 sm:gap-1 justify-center">
     <HandCard
-      v-for="(card, i) in hand"
+      v-for="(card, i) in sortedHand"
       :key="cardKey(card, i)"
       :card="card"
       :is-valid="isValid(card)"
