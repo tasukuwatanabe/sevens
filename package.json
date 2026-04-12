@@ -20,7 +20,6 @@
     "@tailwindcss/postcss": "4.2.2",
     "@types/node": "24.12.2",
     "@vitejs/plugin-vue": "6.0.5",
-    "@voidzero-dev/vite-plus-core": "0.1.15",
     "postcss": "8.5.9",
     "tailwindcss": "4.2.2",
     "vite-plugin-pwa": "1.2.0",
