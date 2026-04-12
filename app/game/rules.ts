@@ -1,12 +1,12 @@
 import type { Card, NormalCard, Board, Player } from "@/types/game";
 import { SUITS, MAX_PASSES } from "./constants";
-import { isJokerCard } from "@/utils/card";
+import { isJokerCard, isNormalCard } from "@/utils/card";
+import { createRank } from "@/utils/rank";
 
 export function isValidPlay(card: Card, board: Board): boolean {
-  if (isJokerCard(card)) return false;
-  const c = card as NormalCard;
-  const row = board[c.suit];
-  return c.rank === row.low - 1 || c.rank === row.high + 1;
+  if (!isNormalCard(card)) return false;
+  const row = board[card.suit];
+  return card.rank === row.low - 1 || card.rank === row.high + 1;
 }
 
 export function getValidCards(hand: Card[], board: Board): Card[] {
@@ -44,12 +44,12 @@ export function getJokerWithCardOptions(hand: Card[], board: Board): JokerWithCa
     // low 側: ジョーカーを low-1、コンパニオンを low-2 に置く
     // row.low > 2 で絞ることで jokerPos >= 2、companionRank >= 1 を保証する
     if (row.low > 2) {
-      const jokerRank = (row.low - 1) as NormalCard["rank"];
+      const jokerRank = createRank(row.low - 1);
       const holderHasJokerPos = hand.some(
         (c) => !isJokerCard(c) && c.suit === suit && c.rank === jokerRank,
       );
       if (!holderHasJokerPos) {
-        const companionRank = (row.low - 2) as NormalCard["rank"];
+        const companionRank = createRank(row.low - 2);
         const found = hand.find(
           (c): c is NormalCard => !isJokerCard(c) && c.suit === suit && c.rank === companionRank,
         );
@@ -64,12 +64,12 @@ export function getJokerWithCardOptions(hand: Card[], board: Board): JokerWithCa
     // high 側: ジョーカーを high+1、コンパニオンを high+2 に置く
     // row.high < 12 で絞ることで jokerPos <= 12、companionRank <= 13 を保証する
     if (row.high < 12) {
-      const jokerRank = (row.high + 1) as NormalCard["rank"];
+      const jokerRank = createRank(row.high + 1);
       const holderHasJokerPos = hand.some(
         (c) => !isJokerCard(c) && c.suit === suit && c.rank === jokerRank,
       );
       if (!holderHasJokerPos) {
-        const companionRank = (row.high + 2) as NormalCard["rank"];
+        const companionRank = createRank(row.high + 2);
         const found = hand.find(
           (c): c is NormalCard => !isJokerCard(c) && c.suit === suit && c.rank === companionRank,
         );
@@ -89,8 +89,8 @@ export function getValidJokerPositions(board: Board): NormalCard[] {
   const positions: NormalCard[] = [];
   for (const suit of SUITS) {
     const row = board[suit];
-    if (row.low > 1) positions.push({ suit, rank: (row.low - 1) as NormalCard["rank"] });
-    if (row.high < 13) positions.push({ suit, rank: (row.high + 1) as NormalCard["rank"] });
+    if (row.low > 1) positions.push({ suit, rank: createRank(row.low - 1) });
+    if (row.high < 13) positions.push({ suit, rank: createRank(row.high + 1) });
   }
   return positions;
 }

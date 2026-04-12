@@ -1,7 +1,7 @@
 import type { Card, NormalCard, GameState, Board, Player } from "@/types/game";
 import { SUITS, INITIAL_RANK, PLAYER_COUNT } from "./constants";
 import { createDeck, shuffleDeck, dealCards, JOKER_CARD } from "./deck";
-import { areCardsEqual, isJokerCard } from "@/utils/card";
+import { areCardsEqual, isJokerCard, isNormalCard } from "@/utils/card";
 import { isValidPlay } from "./rules";
 
 function createInitialBoard(): Board {
@@ -45,7 +45,7 @@ export function initGame(): GameState {
   // 7はボードの起点として最初から置かれているため、手札に含めると
   // 通常の有効判定（low-1 / high+1）をすり抜けてしまう
   const sevenIndices = deck
-    .map((card, i) => (!isJokerCard(card) && (card as NormalCard).rank === 7 ? i : -1))
+    .map((card, i) => (isNormalCard(card) && card.rank === 7 ? i : -1))
     .filter((i) => i !== -1);
   const remaining = deck.filter((_, i) => !sevenIndices.includes(i));
   const hands = dealCards(remaining, PLAYER_COUNT);
