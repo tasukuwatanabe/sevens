@@ -1,6 +1,3 @@
 .claude/
-.output/
-.nuxt/
-.nitro/
 dist/
 node_modules/
