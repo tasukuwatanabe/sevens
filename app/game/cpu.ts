@@ -2,7 +2,7 @@ import type { Card, NormalCard, Player, Board } from "@/types/game";
 import {
   getValidCards,
   isValidPlay,
-  getValidJokerPositions,
+  getValidJokerPositionsForPlayer,
   getJokerWithCardOptions,
   canPass,
 } from "./rules";
@@ -103,7 +103,7 @@ export function decideCpuAction(player: Player, board: Board, allPlayers: Player
         companionCard: best.companionCard,
       };
     }
-    const validJokerPositions = getValidJokerPositions(board);
+    const validJokerPositions = getValidJokerPositionsForPlayer(board, player.hand);
     if (validJokerPositions.length > 0) {
       return {
         type: "place-joker",

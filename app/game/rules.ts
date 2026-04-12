@@ -94,3 +94,19 @@ export function getValidJokerPositions(board: Board): NormalCard[] {
   }
   return positions;
 }
+
+export function getValidJokerPositionsForPlayer(board: Board, hand: Card[]): NormalCard[] {
+  const allPositions = getValidJokerPositions(board);
+
+  // プレイヤーが持つカードの位置をセットに格納（ジョーカーは除外）
+  const ownedPositions = new Set<string>();
+  for (const card of hand) {
+    if (!isJokerCard(card)) {
+      const normalCard = card as NormalCard;
+      ownedPositions.add(`${normalCard.suit}-${normalCard.rank}`);
+    }
+  }
+
+  // 自分が持つ位置を除外する
+  return allPositions.filter((pos) => !ownedPositions.has(`${pos.suit}-${pos.rank}`));
+}

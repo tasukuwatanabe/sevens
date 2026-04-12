@@ -1,6 +1,6 @@
 import { ref, computed, type ComputedRef } from "vue";
 import type { Card, NormalCard, Board } from "@/types/game";
-import { getValidJokerPositions, getJokerWithCardOptions } from "@/game/rules";
+import { getValidJokerPositionsForPlayer, getJokerWithCardOptions } from "@/game/rules";
 import type { JokerWithCardOption } from "@/game/rules";
 import { isJokerCard, areCardsEqual } from "@/utils/card";
 
@@ -37,7 +37,7 @@ export function useJokerMode(options: {
 
   const validJokerPositions = computed<NormalCard[]>(() => {
     if (!jokerMode.value || selectedJokerPos.value || !board.value) return [];
-    return getValidJokerPositions(board.value);
+    return getValidJokerPositionsForPlayer(board.value, hand.value);
   });
 
   function enterJokerMode() {

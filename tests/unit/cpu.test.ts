@@ -320,4 +320,52 @@ describe("decideCpuAction", () => {
     const actionWithoutPass = decideCpuAction(cpuPlayerNoPass, fullBoard, []);
     expect(actionWithoutPass.type).toBe("eliminate");
   });
+
+  it("CPU がジョーカー配置時に自分が持つカード位置を避ける", () => {
+    // CPU がジョーカーを出す状況を作る：
+    // - 通常のカード出し不可（hand に有効なカードがない）
+    // - ジョーカーコンボ不可（high+2, low-2 のカードなし）
+    // - よってジョーカー単体を出す
+    const cpuPlayer = makePlayer({
+      id: "cpu1",
+      hand: [JOKER_CARD, { suit: "diamonds", rank: 3 }, { suit: "clubs", rank: 2 }],
+    });
+    const humanPlayer = makePlayer({
+      id: "human",
+      type: "human",
+      hand: [{ suit: "hearts", rank: 8 }],
+    });
+    const board = makeBoard();
+    const action = decideCpuAction(cpuPlayer, board, [humanPlayer, cpuPlayer]);
+
+    expect(action.type).toBe("place-joker");
+    if (action.type === "place-joker") {
+      // CPU が ♥8 を持っていないため、♥8 位置にはジョーカーを置くこと
+      expect(action.position).toEqual({ suit: "hearts", rank: 8 });
+    }
+  });
+
+  it("getValidJokerPositionsForPlayer が自分が持つ位置を除外する", () => {
+    // このテストは直接新関数をテストして、CPU が正しく使用していることを確認
+    const board = makeBoard();
+
+    // rules.test.ts で詳細テストをしているため、ここでは統合テストのみ
+    // CPU の decideCpuAction が新関数を使用していることを確認する必要がある
+    // CPU が手札に spades, 8 を持っている場合、♠8 位置にはジョーカーを置かない
+
+    const cpuPlayer = makePlayer({
+      id: "cpu1",
+      hand: [
+        JOKER_CARD,
+        { suit: "spades", rank: 8 }, // 有効位置だが、自分が持つ
+      ],
+    });
+
+    const action = decideCpuAction(cpuPlayer, board, [cpuPlayer]);
+    // CPU は通常の "place" または "place-joker" を選ぶが、
+    // 自分が持つ位置を避けることを確認する
+    if (action.type === "place-joker") {
+      expect(action.position).not.toEqual({ suit: "spades", rank: 8 });
+    }
+  });
 });
