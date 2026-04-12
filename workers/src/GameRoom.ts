@@ -19,7 +19,7 @@ import { decideCpuAction } from "../../app/game/cpu";
 import {
   isValidPlay,
   getValidCards,
-  getValidJokerPositions,
+  getValidJokerPositionsForPlayer,
   getJokerWithCardOptions,
   canPass,
   shouldEliminate,
@@ -450,7 +450,7 @@ export class GameRoom implements DurableObject {
           this.sendError(ws, "NO_JOKER", "ジョーカーを持っていません");
           return;
         }
-        const validPositions = getValidJokerPositions(room.game.board);
+        const validPositions = getValidJokerPositionsForPlayer(room.game.board, player.hand);
         const isValid = validPositions.some(
           (p) => p.suit === msg.position.suit && p.rank === msg.position.rank,
         );

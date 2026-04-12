@@ -5,6 +5,7 @@ import {
   canPass,
   shouldEliminate,
   getValidJokerPositions,
+  getValidJokerPositionsForPlayer,
   getJokerWithCardOptions,
 } from "@/game/rules";
 import type { Board, Card, Player, Rank } from "@/types/game";
@@ -326,5 +327,107 @@ describe("getJokerWithCardOptions", () => {
     expect(options).toHaveLength(1);
     expect(options[0]!.jokerPos).toEqual({ suit: "hearts", rank: 8 });
     expect(options[0]!.companionCard).toEqual({ suit: "hearts", rank: 9 });
+  });
+});
+
+describe("getValidJokerPositionsForPlayer", () => {
+  it("手札がない場合はボード的に有効な位置をすべて返す", () => {
+    const board = makeBoard();
+    const positions = getValidJokerPositionsForPlayer(board, []);
+    expect(positions).toHaveLength(8);
+  });
+
+  it("自分が持つカード位置を除外する（high側）", () => {
+    const board = makeBoard();
+    const hand: Card[] = [{ suit: "spades", rank: 8 }];
+    const positions = getValidJokerPositionsForPlayer(board, hand);
+
+    const hasSpades8 = positions.some((p) => p.suit === "spades" && p.rank === 8);
+    expect(hasSpades8).toBe(false);
+
+    const hasSpades6 = positions.some((p) => p.suit === "spades" && p.rank === 6);
+    expect(hasSpades6).toBe(true);
+  });
+
+  it("自分が持つカード位置を除外する（low側）", () => {
+    const board = makeBoard();
+    const hand: Card[] = [{ suit: "clubs", rank: 6 }];
+    const positions = getValidJokerPositionsForPlayer(board, hand);
+
+    const hasClubs6 = positions.some((p) => p.suit === "clubs" && p.rank === 6);
+    expect(hasClubs6).toBe(false);
+
+    const hasClubs8 = positions.some((p) => p.suit === "clubs" && p.rank === 8);
+    expect(hasClubs8).toBe(true);
+  });
+
+  it("複数のスートでカード位置を除外する", () => {
+    const board = makeBoard();
+    const hand: Card[] = [
+      { suit: "spades", rank: 8 },
+      { suit: "hearts", rank: 6 },
+      { suit: "diamonds", rank: 8 },
+    ];
+    const positions = getValidJokerPositionsForPlayer(board, hand);
+
+    expect(positions.some((p) => p.suit === "spades" && p.rank === 8)).toBe(false);
+    expect(positions.some((p) => p.suit === "hearts" && p.rank === 6)).toBe(false);
+    expect(positions.some((p) => p.suit === "diamonds" && p.rank === 8)).toBe(false);
+  });
+
+  it("ジョーカーは除外対象にならない", () => {
+    const board = makeBoard();
+    const hand: Card[] = [JOKER_CARD];
+    const positions = getValidJokerPositionsForPlayer(board, hand);
+
+    expect(positions).toHaveLength(8);
+  });
+
+  it("手札に複数カードがある場合の複合シナリオ", () => {
+    const board = makeBoard({
+      spades: { low: 5, high: 9 },
+      hearts: { low: 7, high: 7 },
+    });
+    const hand: Card[] = [
+      { suit: "spades", rank: 4 },
+      { suit: "spades", rank: 10 },
+      { suit: "hearts", rank: 9 },
+      JOKER_CARD,
+    ];
+    const positions = getValidJokerPositionsForPlayer(board, hand);
+
+    expect(positions.filter((p) => p.suit === "spades")).toHaveLength(0);
+  });
+
+  it("返す位置はすべてNormalCard形式", () => {
+    const board = makeBoard();
+    const hand: Card[] = [{ suit: "spades", rank: 6 }];
+    const positions = getValidJokerPositionsForPlayer(board, hand);
+
+    for (const pos of positions) {
+      expect(pos.suit).toBeDefined();
+      expect(pos.rank).toBeDefined();
+    }
+  });
+
+  it("部分的にボードが埋まった状態で自分が持つ位置を除外する", () => {
+    const board = makeBoard({
+      spades: { low: 4, high: 10 },
+      hearts: { low: 3, high: 11 },
+      diamonds: { low: 2, high: 12 },
+      clubs: { low: 7, high: 7 },
+    });
+    const hand: Card[] = [
+      { suit: "spades", rank: 3 },
+      { suit: "spades", rank: 11 },
+      { suit: "hearts", rank: 2 },
+      { suit: "diamonds", rank: 13 },
+    ];
+    const positions = getValidJokerPositionsForPlayer(board, hand);
+
+    expect(positions.some((p) => p.suit === "spades" && p.rank === 3)).toBe(false);
+    expect(positions.some((p) => p.suit === "spades" && p.rank === 11)).toBe(false);
+    expect(positions.some((p) => p.suit === "hearts" && p.rank === 2)).toBe(false);
+    expect(positions.some((p) => p.suit === "diamonds" && p.rank === 13)).toBe(false);
   });
 });
