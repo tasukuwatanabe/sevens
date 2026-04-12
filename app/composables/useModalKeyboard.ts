@@ -1,3 +1,5 @@
+import { ref, onMounted, onUnmounted } from "vue";
+
 export function useModalKeyboard(onEscape: () => void) {
   const buttonRef = ref<HTMLElement | null>(null);
 

@@ -1,3 +1,4 @@
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import type { Card, NormalCard, GameStatusCode } from "@/types/game";
 import type { ClientMessage, ClientRoomView, SeatIndex, ServerMessage } from "@/types/online";
 import { getValidCards } from "@/game/rules";
@@ -91,8 +92,7 @@ export function useOnlineGame(roomId: string) {
   }
 
   function connect(playerName?: string) {
-    const config = useRuntimeConfig();
-    const workerUrl = config.public.workerUrl as string;
+    const workerUrl = import.meta.env.VITE_WORKER_URL ?? "";
     let wsUrl: string;
     if (workerUrl && !workerUrl.includes("localhost")) {
       const base = workerUrl.replace(/^http/, "ws");

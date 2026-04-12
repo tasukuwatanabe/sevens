@@ -1,8 +1,8 @@
+import { ref, computed, type ComputedRef } from "vue";
 import type { Card, NormalCard, Board } from "@/types/game";
 import { getValidJokerPositions, getJokerWithCardOptions } from "@/game/rules";
 import type { JokerWithCardOption } from "@/game/rules";
 import { isJokerCard, areCardsEqual } from "@/utils/card";
-import type { ComputedRef } from "vue";
 
 export function useJokerMode(options: {
   isPlayerTurn: ComputedRef<boolean>;

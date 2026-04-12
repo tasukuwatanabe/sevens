@@ -1,23 +1,20 @@
 {
-  // https://nuxt.com/docs/guide/concepts/typescript
-  "files": [],
   "compilerOptions": {
-    "paths": {
-      "@/*": ["./app/*"]
-    }
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client", "vite-plugin-pwa/client"],
+    "paths": { "@/*": ["./app/*"] }
   },
-  "references": [
-    {
-      "path": "./.nuxt/tsconfig.app.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.server.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.shared.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.node.json"
-    }
-  ]
+  "include": ["app/**/*", "app/**/*.vue", "vite.config.ts"],
+  "exclude": ["node_modules", "dist", "workers"]
 }
