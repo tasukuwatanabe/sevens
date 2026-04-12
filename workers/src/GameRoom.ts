@@ -40,8 +40,9 @@ interface Session extends SessionMeta {
 }
 
 function createEmptySeats(): SeatInfo[] {
-  return [0, 1, 2, 3].map((i) => ({
-    index: i as SeatIndex,
+  const SEAT_INDICES = [0, 1, 2, 3] as const;
+  return SEAT_INDICES.map((i) => ({
+    index: i,
     status: "empty" as const,
     playerName: null,
     isConnected: false,

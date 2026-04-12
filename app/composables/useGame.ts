@@ -1,5 +1,5 @@
 import { ref, computed, watch } from "vue";
-import type { Card, NormalCard, GameState, GameStatusCode } from "@/types/game";
+import type { Card, GameState, GameStatusCode } from "@/types/game";
 import {
   initGame,
   placeCard,
@@ -10,7 +10,7 @@ import {
 } from "@/game/state";
 import { decideCpuAction } from "@/game/cpu";
 import { getValidCards, canPass, shouldEliminate } from "@/game/rules";
-import { isJokerCard } from "@/utils/card";
+import { isJokerCard, isNormalCard } from "@/utils/card";
 import { sleep } from "@/utils/helpers";
 import { useLocalStorage } from "./useLocalStorage";
 import { useJokerMode } from "./useJokerMode";
@@ -76,9 +76,9 @@ export function useGame() {
   });
 
   function playCard(card: Card) {
-    if (!isHumanTurn.value || isJokerCard(card)) return;
+    if (!isHumanTurn.value || !isNormalCard(card)) return;
     joker.reset();
-    state.value = placeCard(state.value, card as NormalCard);
+    state.value = placeCard(state.value, card);
   }
 
   function pass() {

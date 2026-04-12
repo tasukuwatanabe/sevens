@@ -56,8 +56,5 @@ export function isRedSuit(suit: Suit) {
 
 export function areCardsEqual(a: Card, b: Card): boolean {
   if (isJokerCard(a) || isJokerCard(b)) return isJokerCard(a) && isJokerCard(b);
-  return (
-    (a as NormalCard).suit === (b as NormalCard).suit &&
-    (a as NormalCard).rank === (b as NormalCard).rank
-  );
+  return a.suit === b.suit && a.rank === b.rank;
 }

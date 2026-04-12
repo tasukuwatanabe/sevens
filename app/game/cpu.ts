@@ -7,7 +7,7 @@ import {
   canPass,
 } from "./rules";
 import type { JokerWithCardOption } from "./rules";
-import { areCardsEqual, isJokerCard } from "@/utils/card";
+import { areCardsEqual, isJokerCard, isNormalCard } from "@/utils/card";
 import { updateBoard } from "./state";
 
 export type CpuAction =
@@ -26,10 +26,10 @@ export function countNewlyValidCards(card: NormalCard, hand: Card[], board: Boar
 export function hasNoAdjacentCard(card: NormalCard, hand: Card[]): boolean {
   return !hand.some(
     (c) =>
-      !isJokerCard(c) &&
+      isNormalCard(c) &&
       c !== card &&
-      (c as NormalCard).suit === card.suit &&
-      ((c as NormalCard).rank === card.rank - 1 || (c as NormalCard).rank === card.rank + 1),
+      c.suit === card.suit &&
+      (c.rank === card.rank - 1 || c.rank === card.rank + 1),
   );
 }
 
@@ -83,6 +83,8 @@ function pickBestJokerWithCardOption(
 
 export function decideCpuAction(player: Player, board: Board, allPlayers: Player[]): CpuAction {
   const hasJoker = player.hand.some(isJokerCard);
+  // getValidCards filters through isValidPlay, which returns false for jokers,
+  // so all results are guaranteed to be NormalCard
   const validCards = getValidCards(player.hand, board) as NormalCard[];
 
   // 通常カードが出せる場合はジョーカーを温存する（詰まった時の切り札として使う）
