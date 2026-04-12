@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import type { SeatInfo } from "@/types/online";
 import { MAX_PASSES } from "@/game/constants";
 

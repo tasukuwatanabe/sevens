@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import { COPY_FEEDBACK_DELAY_MS } from "@/game/constants";
 
 const props = defineProps<{
