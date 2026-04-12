@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { ref, computed } from "vue";
 import type { ClientRoomView } from "@/types/online";
+import PlayerSeat from "./PlayerSeat.vue";
+import ShareModal from "./ShareModal.vue";
 
 const props = defineProps<{
   room: ClientRoomView;

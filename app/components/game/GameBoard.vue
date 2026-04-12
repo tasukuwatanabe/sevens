@@ -1,7 +1,20 @@
 <script setup lang="ts">
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 import { SUITS, MAX_PASSES } from "@/game/constants";
 import { useGame } from "@/composables/useGame";
 import type { Suit, Rank, NormalCard } from "@/types/game";
+import CpuPlayer from "./CpuPlayer.vue";
+import BoardRow from "./BoardRow.vue";
+import GameStatus from "./GameStatus.vue";
+import PlayerHand from "./PlayerHand.vue";
+import JokerComboPanel from "./JokerComboPanel.vue";
+import ActionButtons from "./ActionButtons.vue";
+import GameOverModal from "./GameOverModal.vue";
+import ConfirmModal from "../ui/ConfirmModal.vue";
+import JokerReceivedOverlay from "./JokerReceivedOverlay.vue";
+
+const router = useRouter();
 
 const {
   state,
@@ -38,13 +51,13 @@ function handleHomeRequest() {
   if (state.value.phase === "playing") {
     showHomeConfirm.value = true;
   } else {
-    navigateTo("/");
+    router.push("/");
   }
 }
 
 function confirmHome() {
   showHomeConfirm.value = false;
-  navigateTo("/");
+  router.push("/");
 }
 
 function cancelHome() {
@@ -152,7 +165,7 @@ function handleJokerPlace(suit: Suit, rank: Rank) {
       :winner="state.winner"
       :players="state.players"
       @reset="resetGame"
-      @go-home="navigateTo('/')"
+      @go-home="router.push('/')"
     />
 
     <ConfirmModal

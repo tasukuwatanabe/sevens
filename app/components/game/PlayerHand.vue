@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import type { Card } from "@/types/game";
 import { areCardsEqual, isJokerCard, isNormalCard } from "@/utils/card";
+import HandCard from "./HandCard.vue";
 
 const props = defineProps<{
   hand: Card[];

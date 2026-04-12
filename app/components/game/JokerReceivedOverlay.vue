@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { JOKER_NOTIFICATION_DELAY_MS } from "@/game/constants";
 
 const emit = defineEmits<{ close: [] }>();

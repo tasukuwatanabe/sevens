@@ -1,3 +1,4 @@
+import { ref, computed, watch } from "vue";
 import type { Card, NormalCard, GameState, GameStatusCode } from "@/types/game";
 import {
   initGame,

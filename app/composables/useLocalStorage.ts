@@ -1,5 +1,7 @@
+import { ref, onMounted, watch } from "vue";
+
 export function useLocalStorage<T>(key: string, defaultValue: T) {
-  const state = useState<T>(key, () => defaultValue);
+  const state = ref<T>(defaultValue);
 
   onMounted(() => {
     const stored = localStorage.getItem(key);
@@ -11,9 +13,7 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
   watch(
     state,
     (val) => {
-      if (import.meta.client) {
-        localStorage.setItem(key, JSON.stringify(val));
-      }
+      localStorage.setItem(key, JSON.stringify(val));
     },
     { deep: true },
   );

@@ -3,6 +3,7 @@ import { computed } from "vue";
 import type { BoardSuit, NormalCard, Suit, Rank } from "@/types/game";
 import { RANKS } from "@/game/constants";
 import { suitSymbol, suitLabel, isRedSuit } from "@/utils/card";
+import CardSlot from "./CardSlot.vue";
 
 const props = defineProps<{
   boardSuit: BoardSuit;

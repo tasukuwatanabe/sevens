@@ -1,10 +1,19 @@
 <script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { SUITS, MAX_PASSES } from "@/game/constants";
 import { useOnlineGame } from "@/composables/useOnlineGame";
 import { getCompanionLabel } from "@/utils/joker";
 import type { Suit, Rank, NormalCard } from "@/types/game";
+import Lobby from "@/components/online/Lobby.vue";
+import PlayerSeat from "@/components/online/PlayerSeat.vue";
+import TurnTimer from "@/components/online/TurnTimer.vue";
+import BoardRow from "@/components/game/BoardRow.vue";
+import PlayerHand from "@/components/game/PlayerHand.vue";
+import JokerReceivedOverlay from "@/components/game/JokerReceivedOverlay.vue";
 
 const route = useRoute();
+const router = useRouter();
 const roomId = route.params.id as string;
 
 const {
@@ -77,7 +86,7 @@ const isMyWin = computed(
 const showLeaveConfirm = ref(false);
 
 function backToHome() {
-  navigateTo("/");
+  router.push("/");
 }
 </script>
 
@@ -108,7 +117,7 @@ function backToHome() {
     >
       参加する
     </button>
-    <NuxtLink to="/" class="text-green-300 underline text-sm mt-4">トップに戻る</NuxtLink>
+    <router-link to="/" class="text-green-300 underline text-sm mt-4">トップに戻る</router-link>
   </div>
 
   <!-- Connecting -->
@@ -119,7 +128,7 @@ function backToHome() {
     <p v-if="!connected" class="animate-pulse">接続中…</p>
     <p v-else class="animate-pulse">ルーム情報を取得中…</p>
     <p v-if="error" class="text-red-400 mt-2">{{ error }}</p>
-    <NuxtLink to="/" class="text-green-300 underline text-sm mt-4">トップに戻る</NuxtLink>
+    <router-link to="/" class="text-green-300 underline text-sm mt-4">トップに戻る</router-link>
   </div>
 
   <!-- Destroyed room -->
@@ -133,12 +142,12 @@ function backToHome() {
       <p class="text-gray-500 mb-6 text-sm">
         ルームを作成したプレイヤーが退出したため、このルームは利用できません。
       </p>
-      <NuxtLink
+      <router-link
         to="/"
         class="inline-block px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-colors"
       >
         トップに戻る
-      </NuxtLink>
+      </router-link>
     </div>
   </div>
 
@@ -150,7 +159,7 @@ function backToHome() {
     <h1 class="text-center text-xl sm:text-2xl font-bold">7並べ オンライン</h1>
     <Lobby :room="room" @start="startGame" />
     <div class="text-center">
-      <NuxtLink to="/" class="text-green-300 underline text-sm">トップに戻る</NuxtLink>
+      <router-link to="/" class="text-green-300 underline text-sm">トップに戻る</router-link>
     </div>
   </div>
 
